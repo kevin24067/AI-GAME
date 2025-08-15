@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单机双人跳棋</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>单机双人跳棋</h1>
+            <div class="game-info">
+                <div class="player-turn">当前回合: <span id="current-player">红方</span></div>
+                <div class="game-status" id="game-status"></div>
+            </div>
+            <div class="game-controls">
+                <button id="new-game-btn">新游戏</button>
+                <button id="undo-btn">悔棋</button>
+                <a href="../../index.html" class="back-btn">返回大厅</a>
+            </div>
+        </header>
+        
+        <div class="board-container">
+            <div id="checkers-board" class="checkers-board"></div>
+        </div>
+        
+        <div class="game-rules">
+            <h3>游戏规则</h3>
+            <ul>
+                <li>红方和黑方轮流移动棋子</li>
+                <li>棋子只能沿对角线向前移动到相邻的空格</li>
+                <li>如果对角线相邻格有对方棋子，且其后方为空，则可以跳过并吃掉该棋子</li>
+                <li>一次移动中可以连续跳多个棋子</li>
+                <li>当一方棋子到达对方底线时，该棋子升级为"王"，可以向任意方向移动</li>
+                <li>无法移动的一方判负</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script src="js/constants.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/piece.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,600 @@
+/* 激光策略棋样式 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+    background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
+    color: #fff;
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.game-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    font-size: 2.2rem;
+    color: #fff;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.7), 0 0 20px rgba(0, 0, 255, 0.7);
+}
+
+.game-info {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.player-turn {
+    font-weight: bold;
+}
+
+.player-turn span {
+    color: #ff5252;
+}
+
+.player-turn span.blue {
+    color: #40c4ff;
+}
+
+.game-status {
+    color: #ffeb3b;
+    font-weight: bold;
+}
+
+.game-controls {
+    margin-bottom: 20px;
+}
+
+button, .back-btn {
+    background-color: #303f9f;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    margin: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 0 10px rgba(0, 0, 255, 0.5);
+}
+
+button:hover, .back-btn:hover {
+    background-color: #3f51b5;
+    box-shadow: 0 0 15px rgba(0, 0, 255, 0.7);
+}
+
+#rotate-btn {
+    background-color: #c2185b;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+#rotate-btn:hover {
+    background-color: #e91e63;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+}
+
+#rotate-btn.active {
+    background-color: #e91e63;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+    animation: pulse 1s infinite alternate;
+}
+
+.back-btn {
+    background-color: #455a64;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.back-btn:hover {
+    background-color: #607d8b;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.board-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.laser-board {
+    display: grid;
+    grid-template-columns: repeat(10, 50px);
+    grid-template-rows: repeat(8, 50px);
+    border: 2px solid #fff;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    background-color: #263238;
+    position: relative;
+}
+
+.square {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.square.selected {
+    background-color: rgba(255, 255, 0, 0.3);
+    box-shadow: inset 0 0 10px rgba(255, 255, 0, 0.5);
+}
+
+.square.valid-move {
+    background-color: rgba(0, 255, 0, 0.2);
+    cursor: pointer;
+}
+
+.square.valid-move:hover {
+    background-color: rgba(0, 255, 0, 0.4);
+}
+
+/* 移动提示标记 */
+.move-indicator {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba(0, 255, 0, 0.7);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+    animation: pulse 1s infinite alternate;
+    z-index: 5;
+}
+
+/* 棋子样式 */
+.piece {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.piece.red {
+    background-color: rgba(255, 0, 0, 0.7);
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+}
+
+.piece.blue {
+    background-color: rgba(0, 0, 255, 0.7);
+    box-shadow: 0 0 10px rgba(0, 0, 255, 0.7);
+}
+
+.piece:hover {
+    transform: scale(1.1);
+}
+
+/* 可旋转提示 */
+.piece.can-rotate {
+    animation: rotate-hint 2s infinite;
+    cursor: pointer;
+}
+
+@keyframes rotate-hint {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(10deg); }
+    75% { transform: rotate(-10deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* 单面镜样式 - 改进版 */
+.piece.single-mirror {
+    overflow: visible;
+    background: transparent;
+    box-shadow: none;
+}
+
+.piece.single-mirror::before {
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 6px;
+    background: linear-gradient(to right, 
+        rgba(255, 255, 255, 0.9) 0%, 
+        rgba(200, 200, 200, 0.9) 100%);
+    border-radius: 3px;
+    transform-origin: center;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+}
+
+/* 单面镜反射面指示器 */
+.piece.single-mirror::after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+}
+
+.piece.red.single-mirror::after {
+    background-color: #ff5252;
+    box-shadow: 0 0 5px #ff5252;
+}
+
+.piece.blue.single-mirror::after {
+    background-color: #40c4ff;
+    box-shadow: 0 0 5px #40c4ff;
+}
+
+/* 单面镜方向样式 */
+.piece.single-mirror.orientation-0::before {
+    transform: rotate(45deg);
+}
+.piece.single-mirror.orientation-0::after {
+    top: -5px;
+    right: -5px;
+}
+
+.piece.single-mirror.orientation-90::before {
+    transform: rotate(135deg);
+}
+.piece.single-mirror.orientation-90::after {
+    bottom: -5px;
+    right: -5px;
+}
+
+.piece.single-mirror.orientation-180::before {
+    transform: rotate(225deg);
+}
+.piece.single-mirror.orientation-180::after {
+    bottom: -5px;
+    left: -5px;
+}
+
+.piece.single-mirror.orientation-270::before {
+    transform: rotate(315deg);
+}
+.piece.single-mirror.orientation-270::after {
+    top: -5px;
+    left: -5px;
+}
+
+/* 双面镜样式 - 对角线版本 */
+.piece.double-mirror {
+    overflow: visible;
+    background: transparent;
+    box-shadow: none;
+}
+
+.piece.double-mirror::before,
+.piece.double-mirror::after {
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 6px;
+    background: linear-gradient(to right, 
+        rgba(255, 255, 255, 0.9) 0%, 
+        rgba(200, 200, 200, 0.9) 100%);
+    border-radius: 3px;
+    transform-origin: center;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+}
+
+/* 双面镜反射面指示器 */
+.piece.double-mirror .indicator-1,
+.piece.double-mirror .indicator-2 {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    z-index: 2;
+}
+
+.piece.red.double-mirror .indicator-1,
+.piece.red.double-mirror .indicator-2 {
+    background-color: #ff5252;
+    box-shadow: 0 0 5px #ff5252;
+}
+
+.piece.blue.double-mirror .indicator-1,
+.piece.blue.double-mirror .indicator-2 {
+    background-color: #40c4ff;
+    box-shadow: 0 0 5px #40c4ff;
+}
+
+/* 双面镜方向样式 - 对角线 */
+.piece.double-mirror.orientation-0::before {
+    transform: rotate(45deg);
+}
+.piece.double-mirror.orientation-0::after {
+    transform: rotate(135deg);
+}
+.piece.double-mirror.orientation-0 .indicator-1 {
+    top: -5px;
+    right: -5px;
+}
+.piece.double-mirror.orientation-0 .indicator-2 {
+    bottom: -5px;
+    left: -5px;
+}
+
+.piece.double-mirror.orientation-90::before {
+    transform: rotate(135deg);
+}
+.piece.double-mirror.orientation-90::after {
+    transform: rotate(45deg);
+}
+.piece.double-mirror.orientation-90 .indicator-1 {
+    bottom: -5px;
+    right: -5px;
+}
+.piece.double-mirror.orientation-90 .indicator-2 {
+    top: -5px;
+    left: -5px;
+}
+
+.piece.double-mirror.orientation-180::before {
+    transform: rotate(45deg);
+}
+.piece.double-mirror.orientation-180::after {
+    transform: rotate(135deg);
+}
+.piece.double-mirror.orientation-180 .indicator-1 {
+    bottom: -5px;
+    left: -5px;
+}
+.piece.double-mirror.orientation-180 .indicator-2 {
+    top: -5px;
+    right: -5px;
+}
+
+.piece.double-mirror.orientation-270::before {
+    transform: rotate(135deg);
+}
+.piece.double-mirror.orientation-270::after {
+    transform: rotate(45deg);
+}
+.piece.double-mirror.orientation-270 .indicator-1 {
+    top: -5px;
+    left: -5px;
+}
+.piece.double-mirror.orientation-270 .indicator-2 {
+    bottom: -5px;
+    right: -5px;
+}
+
+/* 吸收器样式 */
+.piece.absorber {
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.7) 30%, rgba(255, 0, 0, 0.7) 100%);
+}
+
+.piece.blue.absorber {
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.7) 30%, rgba(0, 0, 255, 0.7) 100%);
+}
+
+/* 棱镜样式 */
+.piece.prism {
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    background: linear-gradient(to bottom, 
+        rgba(255, 0, 0, 0.7), 
+        rgba(255, 165, 0, 0.7), 
+        rgba(255, 255, 0, 0.7), 
+        rgba(0, 128, 0, 0.7), 
+        rgba(0, 0, 255, 0.7), 
+        rgba(75, 0, 130, 0.7), 
+        rgba(238, 130, 238, 0.7));
+}
+
+/* 法老样式 */
+.piece.pharaoh {
+    clip-path: polygon(50% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    background: linear-gradient(to bottom, gold, darkgoldenrod);
+    box-shadow: 0 0 15px gold;
+}
+
+.piece.red.pharaoh {
+    background: linear-gradient(to bottom, gold, darkred);
+}
+
+.piece.blue.pharaoh {
+    background: linear-gradient(to bottom, gold, darkblue);
+}
+
+/* 激光发射器样式 - 对角布局 */
+.piece.launcher {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: 0 0 15px white;
+    position: relative;
+}
+
+.piece.red.launcher {
+    background-color: #ff5252;
+    box-shadow: 0 0 15px #ff5252;
+}
+
+.piece.red.launcher::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 12px solid #ff5252;
+    transform: rotate(135deg);
+    top: 15px;
+    left: 15px;
+}
+
+.piece.blue.launcher {
+    background-color: #40c4ff;
+    box-shadow: 0 0 15px #40c4ff;
+}
+
+.piece.blue.launcher::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 12px solid #40c4ff;
+    transform: rotate(-45deg);
+    top: 5px;
+    left: 5px;
+}
+
+/* 激光样式 */
+.laser {
+    position: absolute;
+    background-color: rgba(255, 0, 0, 0.7);
+    z-index: 10;
+    pointer-events: none;
+    box-shadow: 0 0 5px red, 0 0 10px red;
+}
+
+.laser.horizontal {
+    height: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.laser.vertical {
+    width: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.laser.blue {
+    background-color: rgba(0, 0, 255, 0.7);
+    box-shadow: 0 0 5px blue, 0 0 10px blue;
+}
+
+.laser.green {
+    background-color: rgba(0, 255, 0, 0.7);
+    box-shadow: 0 0 5px green, 0 0 10px green;
+}
+
+.laser.yellow {
+    background-color: rgba(255, 255, 0, 0.7);
+    box-shadow: 0 0 5px yellow, 0 0 10px yellow;
+}
+
+/* 被击中的棋子样式 */
+.piece.killed {
+    animation: killed 1s forwards;
+}
+
+@keyframes killed {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+/* 游戏规则样式 */
+.game-rules {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.game-rules h3 {
+    color: #ffeb3b;
+    margin-bottom: 10px;
+}
+
+.game-rules ul {
+    padding-left: 20px;
+}
+
+.game-rules li {
+    margin-bottom: 5px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .game-container {
+        padding: 10px;
+    }
+    
+    header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .game-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .laser-board {
+        grid-template-columns: repeat(10, 35px);
+        grid-template-rows: repeat(8, 35px);
+    }
+    
+    .square {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .piece {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .piece.single-mirror::before,
+    .piece.double-mirror::before,
+    .piece.double-mirror::after {
+        width: 20px;
+    }
+}
+
+/* 动画效果 */
+@keyframes laserPulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+.laser {
+    animation: laserPulse 0.5s infinite;
+}
+
+@keyframes victory {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.victory {
+    animation: victory 1s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1.1); }
+}

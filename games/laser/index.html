@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>激光策略棋</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>激光策略棋</h1>
+            <div class="game-info">
+                <div class="player-turn">当前回合: <span id="current-player">红方</span></div>
+                <div class="game-status" id="game-status"></div>
+            </div>
+            <div class="game-controls">
+                <button id="new-game-btn">新游戏</button>
+                <button id="rotate-btn">旋转棋子</button>
+                <a href="../../index.html" class="back-btn">返回大厅</a>
+            </div>
+        </header>
+        
+        <div class="board-container">
+            <div id="laser-board" class="laser-board"></div>
+        </div>
+        
+        <div class="game-rules">
+            <h3>游戏规则</h3>
+            <ul>
+                <li>红蓝双方轮流行动，每回合可以移动一个棋子或旋转一个棋子</li>
+                <li>行动结束后，该方的激光发射器会自动发射激光</li>
+                <li>激光会被镜子反射，被吸收器吸收，被棱镜改变颜色</li>
+                <li>当激光击中对方的"法老"棋子时，游戏结束</li>
+                <li>棋子类型：
+                    <ul>
+                        <li><strong>单面镜</strong>：可以将激光反射90度</li>
+                        <li><strong>双面镜</strong>：可以将激光反射到两个不同方向</li>
+                        <li><strong>吸收器</strong>：可以吸收特定波长的激光</li>
+                        <li><strong>棱镜</strong>：可以改变激光的颜色</li>
+                        <li><strong>法老</strong>：游戏的目标，被激光击中则失败</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <script src="js/constants.js"></script>
+    <script src="js/piece.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/laser.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

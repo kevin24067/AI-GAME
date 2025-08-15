@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国象棋</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>中国象棋</h1>
+            <div class="game-info">
+                <div class="player-info" id="player-red">红方: 玩家</div>
+                <div class="player-info" id="player-black">黑方: 电脑</div>
+                <div class="turn-info" id="turn-info">当前回合: 红方</div>
+            </div>
+        </div>
+        
+        <div class="board-container">
+            <canvas id="chessBoard" width="700" height="800"></canvas>
+        </div>
+        
+        <div class="game-controls">
+            <button id="newGameBtn">新游戏</button>
+            <button id="undoBtn">悔棋</button>
+            <button id="hintBtn">提示</button>
+        </div>
+        
+        <div id="gameOverScreen" class="screen hidden">
+            <h2>游戏结束</h2>
+            <p id="winnerInfo">红方胜利!</p>
+            <button id="restartButton">再来一局</button>
+        </div>
+        
+        <div class="back-to-lobby">
+            <a href="../../index.html">返回游戏大厅</a>
+        </div>
+    </div>
+    
+    <script src="js/constants.js"></script>
+    <script src="js/piece.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/ai.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

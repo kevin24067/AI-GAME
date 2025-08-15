@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>算术小游戏</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>算术小游戏</h1>
+            <div class="back-to-lobby">
+                <a href="../../index.html">返回游戏大厅</a>
+            </div>
+        </div>
+        
+        <!-- 开始界面 -->
+        <div id="startScreen" class="screen">
+            <h2>欢迎来到算术小游戏！</h2>
+            <p>选择难度级别开始挑战：</p>
+            
+            <div class="grade-selection">
+                <button class="grade-btn" data-grade="1">一年级</button>
+                <button class="grade-btn" data-grade="2">二年级</button>
+                <button class="grade-btn" data-grade="3">三年级</button>
+                <button class="grade-btn" data-grade="4">四年级</button>
+                <button class="grade-btn" data-grade="5">五年级</button>
+                <button class="grade-btn" data-grade="6">六年级</button>
+            </div>
+            
+            <div class="game-rules">
+                <h3>游戏规则：</h3>
+                <ul>
+                    <li>每次游戏包含10道算术题</li>
+                    <li>答对得1分，答错不得分</li>
+                    <li>完成所有题目后，将显示成绩报告</li>
+                    <li>挑战自己，提高算术能力！</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- 游戏界面 -->
+        <div id="gameScreen" class="screen hidden">
+            <div class="game-info">
+                <div class="progress">题目：<span id="currentQuestion">1</span>/10</div>
+                <div class="timer">时间：<span id="timer">00:00</span></div>
+            </div>
+            
+            <div class="question-container">
+                <div id="question" class="question">5 + 3 = ?</div>
+                <input type="number" id="answerInput" class="answer-input" placeholder="输入答案">
+                <button id="submitBtn" class="submit-btn">提交</button>
+            </div>
+        </div>
+        
+        <!-- 结果界面 -->
+        <div id="resultScreen" class="screen hidden">
+            <h2>游戏结束！</h2>
+            
+            <div class="result-summary">
+                <div class="score">得分：<span id="finalScore">0</span>/10</div>
+                <div class="time">用时：<span id="finalTime">00:00</span></div>
+            </div>
+            
+            <div class="result-details">
+                <h3>答题详情：</h3>
+                <div id="questionList" class="question-list">
+                    <!-- 动态生成的题目列表 -->
+                </div>
+            </div>
+            
+            <div class="wrong-questions">
+                <h3>错题总结：</h3>
+                <div id="wrongQuestionList" class="question-list">
+                    <!-- 动态生成的错题列表 -->
+                </div>
+            </div>
+            
+            <div class="result-actions">
+                <button id="playAgainBtn" class="play-again-btn">再玩一次</button>
+                <button id="changeGradeBtn" class="change-grade-btn">更换年级</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/questions.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
