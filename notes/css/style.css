@@ -24,93 +24,114 @@ body {
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    padding: 30px;
+    height: calc(100vh - 40px);
+}
+
+/* 布局 */
+.notes-layout {
+    display: flex;
+    height: 100%;
+}
+
+/* 侧边栏 */
+.notes-sidebar {
+    width: 220px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-right: 1px solid #eaeaea;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 40px);
+    gap: 20px;
+}
+
+/* 主内容区 */
+.notes-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow: hidden;
 }
 
 /* 页头样式 */
 header {
     text-align: center;
-    padding: 20px 0;
+    padding: 10px 0 20px;
     position: relative;
 }
 
 header h1 {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     color: #3498db;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     font-weight: bold;
 }
 
 header p {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #7f8c8d;
-    margin-bottom: 15px;
+    margin-bottom: 0;
 }
 
 /* 返回按钮 */
 .back-button {
-    display: inline-block;
+    display: block;
     background-color: #3498db;
     color: white;
-    padding: 8px 16px;
-    border-radius: 30px;
+    padding: 10px;
+    border-radius: 8px;
     text-decoration: none;
     font-weight: bold;
     text-align: center;
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
 }
 
 .back-button:hover {
     background-color: #2980b9;
     transform: translateY(-2px);
-    box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* 导航栏样式 */
 .notes-nav {
     background-color: #f8f9fa;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 15px;
-    margin: 0 auto 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    max-width: 800px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .nav-title {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #3498db;
-    margin-bottom: 10px;
-    text-align: center;
+    margin-bottom: 15px;
+    text-align: left;
     font-weight: bold;
     border-bottom: 1px solid #eaeaea;
-    padding-bottom: 10px;
+    padding-bottom: 8px;
 }
 
 .nav-list {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 8px;
     list-style: none;
 }
 
 .nav-item {
-    margin: 5px;
+    margin: 0;
 }
 
 .nav-item a {
-    display: inline-block;
-    padding: 8px 15px;
+    display: block;
+    padding: 8px 12px;
     background-color: #e9f2fb;
     color: #3498db;
-    border-radius: 20px;
+    border-radius: 6px;
     text-decoration: none;
     font-size: 0.9rem;
     transition: all 0.3s ease;
@@ -130,26 +151,23 @@ header p {
 
 .nav-item:not(.disabled):not(.active) a:hover {
     background-color: #d6eaf8;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 /* 随笔展示区域 */
 .notes-display {
     flex-grow: 1;
-    margin: 20px 0;
     overflow: auto;
-    padding: 0 20px;
+    padding-right: 10px;
 }
 
 /* 随笔卡片 */
 .note-card {
     background-color: white;
     border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-    padding: 30px;
-    margin-bottom: 30px;
-    max-width: 800px;
-    margin: 0 auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    margin-bottom: 20px;
 }
 
 /* 随笔标题 */
@@ -219,24 +237,33 @@ footer {
 /* 响应式设计 */
 @media (max-width: 768px) {
     .notes-container {
-        padding: 15px;
         height: auto;
         min-height: calc(100vh - 40px);
     }
     
-    .nav-list {
+    .notes-layout {
         flex-direction: column;
-        align-items: center;
+    }
+    
+    .notes-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #eaeaea;
+        padding: 15px;
+    }
+    
+    .notes-main {
+        padding: 15px;
+    }
+    
+    .nav-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
     }
     
     .nav-item {
-        width: 100%;
-        text-align: center;
-    }
-    
-    .nav-item a {
-        display: block;
-        width: 100%;
+        margin: 5px;
     }
     
     .note-card {
@@ -250,4 +277,30 @@ footer {
     .note-content {
         font-size: 1rem;
     }
+    
+    header h1 {
+        font-size: 1.8rem;
+    }
+    
+    header p {
+        font-size: 1rem;
+    }
+}
+
+/* 隐藏滚动条但保持功能 */
+.notes-display::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notes-display::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.notes-display::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.notes-display:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
 }
