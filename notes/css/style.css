@@ -1,0 +1,253 @@
+/* 游戏随笔样式 */
+
+/* 全局样式重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* 随笔容器 */
+.notes-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 40px);
+}
+
+/* 页头样式 */
+header {
+    text-align: center;
+    padding: 20px 0;
+    position: relative;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    color: #3498db;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+}
+
+header p {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    margin-bottom: 15px;
+}
+
+/* 返回按钮 */
+.back-button {
+    display: inline-block;
+    background-color: #3498db;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.back-button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* 导航栏样式 */
+.notes-nav {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 0 auto 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    max-width: 800px;
+}
+
+.nav-title {
+    font-size: 1.2rem;
+    color: #3498db;
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 10px;
+}
+
+.nav-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    list-style: none;
+}
+
+.nav-item {
+    margin: 5px;
+}
+
+.nav-item a {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #e9f2fb;
+    color: #3498db;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.nav-item.active a {
+    background-color: #3498db;
+    color: white;
+    box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
+}
+
+.nav-item.disabled a {
+    background-color: #f1f1f1;
+    color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+.nav-item:not(.disabled):not(.active) a:hover {
+    background-color: #d6eaf8;
+    transform: translateY(-2px);
+}
+
+/* 随笔展示区域 */
+.notes-display {
+    flex-grow: 1;
+    margin: 20px 0;
+    overflow: auto;
+    padding: 0 20px;
+}
+
+/* 随笔卡片 */
+.note-card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-bottom: 30px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* 随笔标题 */
+.note-title {
+    font-size: 2rem;
+    color: #3498db;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 15px;
+}
+
+/* 随笔内容 */
+.note-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #333;
+    margin-bottom: 20px;
+    font-family: 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+}
+
+.note-content p {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* 随笔日期 */
+.note-date {
+    text-align: right;
+    color: #7f8c8d;
+    font-style: italic;
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+
+/* 页脚样式 */
+footer {
+    text-align: center;
+    padding: 15px 0 5px;
+    color: #95a5a6;
+    font-size: 0.9rem;
+    border-top: 1px solid #eaeaea;
+}
+
+/* 诗歌样式 */
+.note-content em {
+    display: block;
+    margin-top: 20px;
+    color: #666;
+    font-style: italic;
+    border-left: 3px solid #3498db;
+    padding-left: 15px;
+    text-align: left;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* 分隔线样式 */
+.note-content hr {
+    border: none;
+    border-top: 1px solid #eaeaea;
+    margin: 30px auto;
+    width: 80%;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .notes-container {
+        padding: 15px;
+        height: auto;
+        min-height: calc(100vh - 40px);
+    }
+    
+    .nav-list {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .nav-item {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .nav-item a {
+        display: block;
+        width: 100%;
+    }
+    
+    .note-card {
+        padding: 20px;
+    }
+    
+    .note-title {
+        font-size: 1.5rem;
+    }
+    
+    .note-content {
+        font-size: 1rem;
+    }
+}

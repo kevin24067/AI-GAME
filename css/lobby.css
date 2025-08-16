@@ -120,6 +120,11 @@ header p {
     box-shadow: 0 0 10px #8e44ad;
 }
 
+.notes-icon {
+    background-color: #27ae60;
+    box-shadow: 0 0 10px rgba(39, 174, 96, 0.5);
+}
+
 /* 游戏信息 */
 .game-info {
     padding: 20px;
