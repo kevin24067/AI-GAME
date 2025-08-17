@@ -1,47 +1,67 @@
-// Supabase 安全配置文件
-// 生产环境中，这些值应该通过服务器端渲染或构建时注入
+// 配置管理 - 安全版本
+class Config {
+    constructor() {
+        this.supabaseUrl = null;
+        this.supabaseAnonKey = null;
+        this.initialized = false;
+    }
 
-// 检查是否在安全环境中
-const isSecureContext = () => {
-    return location.protocol === 'https:' || location.hostname === 'localhost';
-};
+    // 从环境变量或用户输入获取配置
+    async initialize() {
+        if (this.initialized) return;
 
-// 配置 Supabase 连接信息
-window.SUPABASE_CONFIG = {
-    // 在生产环境中，URL 通常可以公开
-    url: 'https://wdevawgwxnxqdgkxnegd.supabase.co',
-    
-    // ANON_KEY 应该从安全来源获取
-    // 在实际部署中，建议通过以下方式之一获取：
-    // 1. 服务器端 API 获取
-    // 2. 构建时环境变量注入
-    // 3. 加密存储后动态解密
-    key: (() => {
-        // 开发环境警告
-        if (!isSecureContext()) {
-            console.warn('⚠️ 非安全上下文，请在 HTTPS 环境中使用');
+        // 尝试从环境变量获取（如果支持）
+        if (typeof process !== 'undefined' && process.env) {
+            this.supabaseUrl = process.env.VITE_SUPABASE_URL;
+            this.supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
         }
-        
-        // 在生产环境中，这里应该是从安全 API 获取的密钥
-        // 目前使用开发环境配置
-        return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkZXZhd2d3eG54cWRna3huZWdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzMDIwODAsImV4cCI6MjA3MDg3ODA4MH0.U_f453KdjSdELparSVe7YKgyLr2R2oLBwdluPFxVjAs';
-    })()
-};
 
-// 生产环境安全建议
+        // 如果没有环境变量，提示用户配置
+        if (!this.supabaseUrl || !this.supabaseAnonKey) {
+            console.warn('⚠️ Supabase 配置缺失');
+            console.warn('请在 .env 文件中配置 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY');
+            console.warn('或者联系管理员获取配置信息');
+            return false;
+        }
+
+        this.initialized = true;
+        return true;
+    }
+
+    getSupabaseConfig() {
+        if (!this.initialized) {
+            throw new Error('配置未初始化，请先调用 initialize()');
+        }
+        return {
+            url: this.supabaseUrl,
+            anonKey: this.supabaseAnonKey
+        };
+    }
+
+    // 检查是否在安全环境中
+    isSecureContext() {
+        return location.protocol === 'https:' || location.hostname === 'localhost';
+    }
+}
+
+// 全局配置实例
+window.appConfig = new Config();
+
+// 安全提示
 console.info(`
-🔒 Supabase 安全配置建议：
+🔒 Supabase 安全配置说明：
 
-开发环境：
-✅ 当前配置适用于开发和测试
+⚠️ 重要：敏感信息已从代码中移除
+
+配置步骤：
+1. 复制 .env.example 为 .env
+2. 在 .env 中填入您的 Supabase 配置
+3. 确保 .env 文件不被提交到代码库
 
 生产环境建议：
-1. 使用环境变量注入密钥
-2. 通过服务器端 API 获取配置
-3. 实施密钥轮换策略
-4. 启用 RLS (Row Level Security)
-5. 配置域名白名单
-6. 监控 API 使用情况
-
-当前环境: ${isSecureContext() ? 'HTTPS/Localhost' : 'HTTP (不安全)'}
+- 使用服务器端环境变量
+- 实施 API 密钥轮换
+- 启用 RLS (Row Level Security)
+- 配置域名白名单
+- 监控 API 使用情况
 `);

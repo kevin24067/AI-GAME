@@ -1,35 +1,9 @@
-// Supabase 配置和客户端
-// 从环境变量或配置文件中获取敏感信息
-const getSupabaseConfig = () => {
-    // 优先从环境变量获取
-    if (typeof process !== 'undefined' && process.env) {
-        return {
-            url: process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL,
-            key: process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
-        };
-    }
-    
-    // 从全局配置对象获取（需要在 HTML 中设置）
-    if (typeof window !== 'undefined' && window.SUPABASE_CONFIG) {
-        return window.SUPABASE_CONFIG;
-    }
-    
-    // 开发环境默认配置（生产环境应该移除）
-    console.warn('⚠️ 使用默认 Supabase 配置，生产环境请设置环境变量');
-    return {
-        url: 'https://wdevawgwxnxqdgkxnegd.supabase.co',
-        key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkZXZhd2d3eG54cWRna3huZWdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzMDIwODAsImV4cCI6MjA3MDg3ODA4MH0.U_f453KdjSdELparSVe7YKgyLr2R2oLBwdluPFxVjAs'
-    };
-};
-
-const SUPABASE_CONFIG = getSupabaseConfig();
-
-// 创建 Supabase 客户端（使用 CDN 版本）
+// Supabase 客户端 - 安全版本
 let supabase;
 let isInitialized = false;
 
 // 初始化 Supabase 客户端
-function initSupabase() {
+async function initSupabase() {
     try {
         // 避免重复初始化
         if (isInitialized && supabase) {
@@ -43,13 +17,22 @@ function initSupabase() {
             return null;
         }
 
-        // 验证配置
-        if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.key) {
-            throw new Error('Supabase 配置不完整，请检查环境变量设置');
+        // 等待配置初始化
+        if (!window.appConfig) {
+            console.error('配置管理器未找到');
+            return null;
         }
 
+        const configReady = await window.appConfig.initialize();
+        if (!configReady) {
+            console.error('Supabase 配置初始化失败，请检查 .env 文件');
+            return null;
+        }
+
+        const config = window.appConfig.getSupabaseConfig();
+        
         // 创建客户端
-        supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key, {
+        supabase = window.supabase.createClient(config.url, config.anonKey, {
             auth: {
                 autoRefreshToken: true,
                 persistSession: true,
@@ -58,14 +41,14 @@ function initSupabase() {
         });
 
         isInitialized = true;
-        console.log('Supabase 客户端初始化成功');
+        console.log('✅ Supabase 客户端初始化成功');
         
         // 异步测试连接
         setTimeout(testConnection, 1000);
         
         return supabase;
     } catch (error) {
-        console.error('Supabase 初始化失败:', error);
+        console.error('❌ Supabase 初始化失败:', error);
         return null;
     }
 }
@@ -77,12 +60,12 @@ async function testConnection() {
         
         const { data, error } = await supabase.from('user_game_records').select('count', { count: 'exact', head: true });
         if (error) {
-            console.warn('Supabase 连接测试警告:', error.message);
+            console.warn('⚠️ Supabase 连接测试警告:', error.message);
         } else {
-            console.log('Supabase 数据库连接正常');
+            console.log('✅ Supabase 数据库连接正常');
         }
     } catch (error) {
-        console.warn('Supabase 连接测试失败:', error.message);
+        console.warn('⚠️ Supabase 连接测试失败:', error.message);
     }
 }
 
@@ -102,10 +85,10 @@ const auth = {
             
             if (error) throw error;
             
-            console.log('注册成功:', data);
+            console.log('✅ 注册成功:', data);
             return { success: true, data };
         } catch (error) {
-            console.error('注册失败:', error.message);
+            console.error('❌ 注册失败:', error.message);
             return { success: false, error: error.message };
         }
     },
@@ -124,10 +107,10 @@ const auth = {
             
             if (error) throw error;
             
-            console.log('登录成功:', data);
+            console.log('✅ 登录成功:', data);
             return { success: true, data };
         } catch (error) {
-            console.error('登录失败:', error.message);
+            console.error('❌ 登录失败:', error.message);
             return { success: false, error: error.message };
         }
     },
@@ -143,10 +126,10 @@ const auth = {
             
             if (error) throw error;
             
-            console.log('登出成功');
+            console.log('✅ 登出成功');
             return { success: true };
         } catch (error) {
-            console.error('登出失败:', error.message);
+            console.error('❌ 登出失败:', error.message);
             return { success: false, error: error.message };
         }
     },
@@ -155,7 +138,7 @@ const auth = {
     async getCurrentUser() {
         try {
             if (!supabase) {
-                console.warn('Supabase 客户端未初始化');
+                console.warn('⚠️ Supabase 客户端未初始化');
                 return null;
             }
 
@@ -163,20 +146,20 @@ const auth = {
             if (error) {
                 // 如果是无效 JWT 错误，尝试刷新会话
                 if (error.message.includes('JWT') || error.message.includes('invalid')) {
-                    console.log('尝试刷新用户会话...');
+                    console.log('🔄 尝试刷新用户会话...');
                     const { data: { session } } = await supabase.auth.getSession();
                     return session?.user || null;
                 }
-                console.warn('获取用户信息失败:', error.message);
+                console.warn('⚠️ 获取用户信息失败:', error.message);
                 return null;
             }
             
             if (user) {
-                console.log('获取到用户信息:', user.email);
+                console.log('👤 获取到用户信息:', user.email);
             }
             return user;
         } catch (error) {
-            console.error('获取用户信息异常:', error.message);
+            console.error('❌ 获取用户信息异常:', error.message);
             return null;
         }
     },
@@ -185,18 +168,18 @@ const auth = {
     async getSession() {
         try {
             if (!supabase) {
-                console.warn('Supabase 客户端未初始化');
+                console.warn('⚠️ Supabase 客户端未初始化');
                 return null;
             }
 
             const { data: { session }, error } = await supabase.auth.getSession();
             if (error) {
-                console.warn('获取会话失败:', error.message);
+                console.warn('⚠️ 获取会话失败:', error.message);
                 return null;
             }
             return session;
         } catch (error) {
-            console.error('获取会话异常:', error.message);
+            console.error('❌ 获取会话异常:', error.message);
             return null;
         }
     },
@@ -210,7 +193,7 @@ const auth = {
     // 监听认证状态变化
     onAuthStateChange(callback) {
         if (!supabase) {
-            console.warn('Supabase 客户端未初始化');
+            console.warn('⚠️ Supabase 客户端未初始化');
             return null;
         }
         return supabase.auth.onAuthStateChange(callback);
@@ -233,10 +216,10 @@ const database = {
             
             if (error) throw error;
             
-            console.log('数据插入成功:', result);
+            console.log('✅ 数据插入成功:', result);
             return { success: true, data: result };
         } catch (error) {
-            console.error('数据插入失败:', error.message);
+            console.error('❌ 数据插入失败:', error.message);
             return { success: false, error: error.message };
         }
     },
@@ -259,10 +242,10 @@ const database = {
             
             if (error) throw error;
             
-            console.log('数据查询成功:', data);
+            console.log('✅ 数据查询成功:', data);
             return { success: true, data };
         } catch (error) {
-            console.error('数据查询失败:', error.message);
+            console.error('❌ 数据查询失败:', error.message);
             return { success: false, error: error.message };
         }
     },
@@ -285,10 +268,10 @@ const database = {
             
             if (error) throw error;
             
-            console.log('数据更新成功:', result);
+            console.log('✅ 数据更新成功:', result);
             return { success: true, data: result };
         } catch (error) {
-            console.error('数据更新失败:', error.message);
+            console.error('❌ 数据更新失败:', error.message);
             return { success: false, error: error.message };
         }
     },
@@ -311,10 +294,10 @@ const database = {
             
             if (error) throw error;
             
-            console.log('数据删除成功:', data);
+            console.log('✅ 数据删除成功:', data);
             return { success: true, data };
         } catch (error) {
-            console.error('数据删除失败:', error.message);
+            console.error('❌ 数据删除失败:', error.message);
             return { success: false, error: error.message };
         }
     }
