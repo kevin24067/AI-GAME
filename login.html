@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录 - 游戏大厅</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <h1>游戏大厅登录</h1>
+            
+            <div class="auth-tabs">
+                <button class="tab-btn active" onclick="showLogin()">登录</button>
+                <button class="tab-btn" onclick="showRegister()">注册</button>
+            </div>
+            
+            <!-- 登录表单 -->
+            <div id="login-form" class="auth-form">
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="login-email">邮箱</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">密码</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="auth-btn">登录</button>
+                </form>
+            </div>
+            
+            <!-- 注册表单 -->
+            <div id="register-form" class="auth-form" style="display: none;">
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label for="register-email">邮箱</label>
+                        <input type="email" id="register-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">密码</label>
+                        <input type="password" id="register-password" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">确认密码</label>
+                        <input type="password" id="confirm-password" required minlength="6">
+                    </div>
+                    <button type="submit" class="auth-btn">注册</button>
+                </form>
+            </div>
+            
+            <div class="message" id="message"></div>
+            
+            <div class="back-link">
+                <a href="index.html">返回游戏大厅</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 从 CDN 加载 Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script>
+        // 页面加载时初始化 Supabase
+        document.addEventListener('DOMContentLoaded', function() {
+            const client = window.SupabaseClient.init();
+            if (client) {
+                console.log('Supabase 连接成功！');
+                
+                // 检查用户是否已登录
+                checkAuthStatus();
+            }
+        });
+
+        // 检查认证状态
+        async function checkAuthStatus() {
+            const user = await window.SupabaseClient.auth.getCurrentUser();
+            if (user) {
+                showMessage(`欢迎回来，${user.email}！`, 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            }
+        }
+
+        // 切换到登录表单
+        function showLogin() {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('register-form').style.display = 'none';
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            document.querySelectorAll('.tab-btn')[1].classList.remove('active');
+        }
+
+        // 切换到注册表单
+        function showRegister() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+            document.querySelectorAll('.tab-btn')[0].classList.remove('active');
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        }
+
+        // 处理登录
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            showMessage('正在登录...', 'info');
+            
+            const result = await window.SupabaseClient.auth.signIn(email, password);
+            
+            if (result.success) {
+                showMessage('登录成功！正在跳转...', 'success');
+                console.log('登录成功，用户信息:', result.data);
+                
+                // 确保认证状态已更新后再跳转
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } else {
+                showMessage(`登录失败: ${result.error}`, 'error');
+            }
+        }
+
+        // 处理注册
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (password !== confirmPassword) {
+                showMessage('密码确认不匹配', 'error');
+                return;
+            }
+            
+            showMessage('正在注册...', 'info');
+            
+            const result = await window.SupabaseClient.auth.signUp(email, password);
+            
+            if (result.success) {
+                showMessage('注册成功！请检查邮箱验证链接。', 'success');
+                // 切换到登录表单
+                setTimeout(() => {
+                    showLogin();
+                }, 3000);
+            } else {
+                showMessage(`注册失败: ${result.error}`, 'error');
+            }
+        }
+
+        // 显示消息
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            messageEl.style.display = 'block';
+            
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>

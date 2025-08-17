@@ -7,10 +7,21 @@
     <link rel="stylesheet" href="css/lobby.css">
 </head>
 <body>
+    <!-- 从 CDN 加载 Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    
     <div class="lobby-container">
         <header>
             <h1>游戏大厅</h1>
             <p>选择一个游戏开始玩吧！</p>
+            <div class="auth-section">
+                <a href="login.html" class="login-btn" id="login-link">登录/注册</a>
+                <span id="user-info" style="display: none;">
+                    欢迎，<span id="user-email"></span>
+                    <button onclick="handleLogout()" class="logout-btn">登出</button>
+                </span>
+            </div>
         </header>
         
         <div class="games-grid">
@@ -99,5 +110,74 @@
             <p>&copy; 2025 游戏大厅 - 所有游戏仅供娱乐</p>
         </footer>
     </div>
+
+    <script>
+        // 页面加载时初始化 Supabase 并检查用户状态
+        document.addEventListener('DOMContentLoaded', function() {
+            // 等待 Supabase 库加载完成
+            setTimeout(() => {
+                const client = window.SupabaseClient.init();
+                if (client) {
+                    console.log('Supabase 连接成功！');
+                    checkAuthStatus();
+                    
+                    // 监听认证状态变化
+                    window.SupabaseClient.auth.onAuthStateChange((event, session) => {
+                        console.log('认证状态变化:', event, session);
+                        checkAuthStatus();
+                    });
+                } else {
+                    console.error('Supabase 初始化失败');
+                }
+            }, 1000);
+        });
+
+        // 检查认证状态
+        async function checkAuthStatus() {
+            try {
+                const user = await window.SupabaseClient.auth.getCurrentUser();
+                console.log('当前用户:', user);
+                
+                if (user) {
+                    // 显示用户信息
+                    document.getElementById('login-link').style.display = 'none';
+                    document.getElementById('user-info').style.display = 'inline-block';
+                    document.getElementById('user-email').textContent = user.email;
+                    console.log('用户已登录:', user.email);
+                } else {
+                    // 显示登录链接
+                    document.getElementById('login-link').style.display = 'inline-block';
+                    document.getElementById('user-info').style.display = 'none';
+                    console.log('用户未登录');
+                }
+            } catch (error) {
+                console.error('检查认证状态失败:', error);
+            }
+        }
+
+        // 处理登出
+        async function handleLogout() {
+            try {
+                const result = await window.SupabaseClient.auth.signOut();
+                if (result.success) {
+                    console.log('登出成功');
+                    // 刷新页面状态
+                    checkAuthStatus();
+                    alert('已成功登出');
+                } else {
+                    console.error('登出失败:', result.error);
+                    alert('登出失败: ' + result.error);
+                }
+            } catch (error) {
+                console.error('登出过程中出错:', error);
+                alert('登出失败');
+            }
+        }
+
+        // 手动刷新认证状态（调试用）
+        function refreshAuth() {
+            checkAuthStatus();
+        }
+    </script>
 </body>
 </html>
