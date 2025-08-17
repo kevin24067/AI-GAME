@@ -1,6 +1,4 @@
-/* 游戏随笔样式 */
-
-/* 全局样式重置 */
+/* 基础样式 */
 * {
     margin: 0;
     padding: 0;
@@ -8,355 +6,206 @@
 }
 
 body {
-    font-family: 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #f5f5f5;
     color: #333;
     line-height: 1.6;
-    min-height: 100vh;
-    padding: 20px;
 }
 
-/* 随笔容器 */
+/* 容器样式 */
 .notes-container {
     max-width: 1200px;
     margin: 0 auto;
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    height: calc(100vh - 40px);
+    padding: 20px;
 }
 
-/* 布局 */
 .notes-layout {
     display: flex;
-    height: 100%;
+    gap: 30px;
+    min-height: 100vh;
 }
 
-/* 侧边栏 */
+/* 侧边栏样式 */
 .notes-sidebar {
-    width: 220px;
-    background-color: #f8f9fa;
+    flex: 0 0 250px;
+    background-color: #fff;
+    border-radius: 10px;
     padding: 20px;
-    border-right: 1px solid #eaeaea;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 20px;
+    height: fit-content;
 }
 
-/* 主内容区 */
-.notes-main {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    overflow: hidden;
-}
-
-/* 页头样式 */
-header {
-    text-align: center;
-    padding: 10px 0 20px;
-    position: relative;
-}
-
-header h1 {
-    font-size: 2.2rem;
-    color: #3498db;
-    margin-bottom: 5px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-    font-weight: bold;
-}
-
-header p {
-    font-size: 1.1rem;
-    color: #7f8c8d;
-    margin-bottom: 0;
-}
-
-/* 返回按钮 */
 .back-button {
     display: block;
-    background-color: #3498db;
-    color: white;
-    padding: 12px;
-    border-radius: 30px;
-    text-decoration: none;
-    font-weight: bold;
-    text-align: center;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
     margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-}
-
-.back-button:before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: all 0.6s ease;
-    z-index: -1;
+    padding: 10px 15px;
+    background-color: #4a6fa5;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    transition: background-color 0.3s;
 }
 
 .back-button:hover {
-    background-color: #2980b9;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
-}
-
-.back-button:hover:before {
-    left: 100%;
-}
-
-/* 导航栏样式 */
-.notes-nav {
-    background: linear-gradient(to bottom, #ffffff, #f8f9fa);
-    border-radius: 12px;
-    padding: 18px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(52, 152, 219, 0.1);
+    background-color: #3a5a80;
 }
 
 .nav-title {
-    font-size: 1.2rem;
-    color: #3498db;
-    margin-bottom: 18px;
-    text-align: center;
+    font-size: 18px;
     font-weight: bold;
-    border-bottom: 2px solid #e6f2fb;
+    margin-bottom: 15px;
+    color: #333;
+    border-bottom: 2px solid #eaeaea;
     padding-bottom: 10px;
-    letter-spacing: 1px;
 }
 
 .nav-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
     list-style: none;
 }
 
 .nav-item {
-    margin: 0;
+    margin-bottom: 10px;
 }
 
 .nav-item a {
     display: block;
-    padding: 12px 15px;
-    background-color: #f0f8ff;
-    color: #3498db;
-    border-radius: 10px;
+    padding: 10px;
     text-decoration: none;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-    border-left: 3px solid transparent;
-    text-align: center;
+    color: #555;
+    border-radius: 5px;
+    transition: all 0.3s;
 }
 
 .nav-item.active a {
-    background-color: #3498db;
-    color: white;
-    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
-    border-left: 3px solid #2980b9;
+    background-color: #e6f0ff;
+    color: #4a6fa5;
     font-weight: bold;
+}
+
+.nav-item:not(.disabled) a:hover {
+    background-color: #f0f5ff;
 }
 
 .nav-item.disabled a {
-    background-color: #f5f5f5;
-    color: #bdc3c7;
+    color: #aaa;
     cursor: not-allowed;
-    border-left: 3px solid #eaeaea;
 }
 
-.nav-item:not(.disabled):not(.active) a:hover {
-    background-color: #e1f0fa;
-    transform: translateY(-2px);
-    border-left: 3px solid #74b9ff;
-}
-
-/* 随笔展示区域 */
-.notes-display {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding-right: 15px;
-    margin-bottom: 20px;
-    max-height: calc(100vh - 200px);
-}
-
-/* 随笔卡片 */
-.note-card {
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+/* 主内容区样式 */
+.notes-main {
+    flex: 1;
+    background-color: #fff;
+    border-radius: 10px;
     padding: 30px;
-    margin-bottom: 20px;
-    border: 1px solid rgba(52, 152, 219, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* 随笔标题 */
-.note-title {
-    font-size: 2rem;
-    color: #3498db;
-    margin-bottom: 25px;
+header {
+    margin-bottom: 30px;
     text-align: center;
-    font-weight: bold;
-    border-bottom: 2px solid #e6f2fb;
-    padding-bottom: 15px;
-    letter-spacing: 1px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-/* 随笔内容 */
-.note-content {
-    font-size: 1.15rem;
-    line-height: 1.9;
+header h1 {
+    font-size: 32px;
     color: #333;
-    margin-bottom: 25px;
-    font-family: 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
+    margin-bottom: 10px;
+}
+
+header p {
+    color: #777;
+    font-size: 16px;
+}
+
+.notes-display {
+    margin-bottom: 40px;
+}
+
+.note-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eaeaea;
+}
+
+.note-title {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.note-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #444;
 }
 
 .note-content p {
-    margin-bottom: 25px;
-    text-align: center;
-    padding: 0 10px;
+    margin-bottom: 20px;
 }
 
-/* 随笔日期 */
-.note-date {
-    text-align: right;
-    color: #7f8c8d;
-    font-style: italic;
-    margin-top: 25px;
-    font-size: 0.95rem;
-    padding-top: 10px;
-    border-top: 1px dashed #eaeaea;
+.note-content hr {
+    margin: 25px 0;
+    border: none;
+    border-top: 1px dashed #ddd;
 }
 
-/* 页脚样式 */
-footer {
-    text-align: center;
-    padding: 15px 0 5px;
-    color: #95a5a6;
-    font-size: 0.9rem;
-    border-top: 1px solid #eaeaea;
-}
-
-/* 诗歌样式 */
 .note-content em {
     display: block;
-    margin-top: 20px;
-    color: #666;
     font-style: italic;
-    border-left: 3px solid #3498db;
-    padding-left: 15px;
-    text-align: left;
-    font-size: 0.95rem;
-    line-height: 1.6;
+    color: #777;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-left: 4px solid #ddd;
+    margin-top: 20px;
 }
 
-/* 分隔线样式 */
-.note-content hr {
-    border: none;
+.note-content ul, .note-content ol {
+    margin-left: 25px;
+    margin-bottom: 20px;
+}
+
+.note-content li {
+    margin-bottom: 10px;
+}
+
+.note-date {
+    text-align: right;
+    color: #999;
+    font-size: 14px;
+    margin-top: 20px;
+}
+
+footer {
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+    margin-top: 40px;
+    padding-top: 20px;
     border-top: 1px solid #eaeaea;
-    margin: 30px auto;
-    width: 80%;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-    .notes-container {
-        height: auto;
-        min-height: calc(100vh - 40px);
-    }
-    
     .notes-layout {
         flex-direction: column;
     }
     
     .notes-sidebar {
+        flex: none;
         width: 100%;
-        border-right: none;
-        border-bottom: 1px solid #eaeaea;
-        padding: 15px;
-    }
-    
-    .notes-main {
-        padding: 15px;
-    }
-    
-    .nav-list {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .nav-item {
-        margin: 5px;
-    }
-    
-    .note-card {
-        padding: 20px;
+        margin-bottom: 20px;
+        position: static;
     }
     
     .note-title {
-        font-size: 1.5rem;
+        font-size: 22px;
     }
-    
-    .note-content {
-        font-size: 1rem;
-    }
-    
-    header h1 {
-        font-size: 1.8rem;
-    }
-    
-    header p {
-        font-size: 1rem;
-    }
-    
-    .notes-display {
-        max-height: none;
-        overflow: visible;
-    }
-}
-
-/* 美化滚动条 */
-.notes-display::-webkit-scrollbar {
-    width: 8px;
-}
-
-.notes-display::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-.notes-display::-webkit-scrollbar-thumb {
-    background-color: rgba(52, 152, 219, 0.3);
-    border-radius: 10px;
-    border: 2px solid #f1f1f1;
-}
-
-.notes-display:hover::-webkit-scrollbar-thumb {
-    background-color: rgba(52, 152, 219, 0.5);
-}
-
-/* 确保内容可见性 */
-.notes-main {
-    overflow-y: auto;
-}
-
-/* 优化页脚 */
-footer {
-    margin-top: auto;
-    padding: 15px 0 10px;
 }

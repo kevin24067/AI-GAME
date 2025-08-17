@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>日常随笔</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="js/notes.js"></script>
 </head>
 <body>
     <div class="notes-container">
@@ -15,10 +16,10 @@
                 <nav class="notes-nav">
                     <div class="nav-title">随笔导航</div>
                     <ul class="nav-list">
-                        <li class="nav-item active"><a href="#" data-id="note-1">商场舞台上的思考</a></li>
+                        <li class="nav-item"><a href="#" data-id="note-1">商场舞台上的思考</a></li>
+                        <li class="nav-item active"><a href="#" data-id="note-2">当我的孩子开始迷恋二次元</a></li>
                         <li class="nav-item disabled"><a href="#" data-id="note-future-1">未来随笔 1</a></li>
                         <li class="nav-item disabled"><a href="#" data-id="note-future-2">未来随笔 2</a></li>
-                        <li class="nav-item disabled"><a href="#" data-id="note-future-3">未来随笔 3</a></li>
                     </ul>
                 </nav>
             </div>
@@ -30,7 +31,7 @@
                 </header>
                 
                 <div class="notes-display" id="notes-content-area">
-                    <div class="note-card">
+                    <div class="note-card" id="note-1" style="display: none;">
                         <h2 class="note-title">商场舞台上的思考</h2>
                         <div class="note-content">
                             <p>商场的舞台上，<br>
@@ -60,6 +61,52 @@
                             <hr>
                             
                             <em>这是一位父亲的内心独白，记录了在商场看到年轻人表演时的复杂心境：既有对年轻人表达方式的理解，也有对女儿未来成长道路的隐隐担忧与好奇。每个父母都在经历着这样的心路历程，既希望保护孩子，又明白终有一天要放手让他们飞向属于自己的天空。</em>
+                        </div>
+                        <div class="note-date">2025年8月17日</div>
+                    </div>
+                    
+                    <div class="note-card" id="note-2">
+                        <h2 class="note-title">当我的孩子开始迷恋二次元：一个80后父亲的代际观察</h2>
+                        <div class="note-content">
+                            <p>上周路过商场中庭，突然被一阵动感音乐吸引。十几个穿着华丽盔甲的少女，正跟着虚拟歌姬的旋律跳着我看不懂的舞步。她们发色绚烂，裙摆飞扬，周围围满了举着荧光棒的年轻人。那一刻我突然意识到：我的孩子再过几年，会不会也成为其中一员？</p>
+                            
+                            <p>这代孩子的娱乐方式，对我们这代人来说实在太陌生了。</p>
+                            
+                            <p>记得我们小时候，一把弹珠、几张贴画就能快乐半天。现在他们追逐的，是屏幕里走出来的虚拟偶像，是动辄上千元的限定周边，是把整个动漫世界搬到现实中的cosplay文化。那些我们觉得"夸张"的造型，在他们眼里是信仰；那些我们看来"怪异"的舞步，是他们圈层的暗号。</p>
+                            
+                            <p>代沟，从来不是新鲜事。</p>
+                            
+                            <p>父亲当年看着我染黄的头发和破洞牛仔裤直摇头，就像我现在看着洛丽塔裙和兽耳发饰感到困惑。每代人都在用自己的方式反抗主流、寻找认同，只是载体在不断变化。</p>
+                            
+                            <p>但作为家长，我的担忧确实更具体：</p>
+                            
+                            <ul>
+                                <li>当孩子对着手机跳"宅舞"时，如何分辨艺术表达和软色情边界？</li>
+                                <li>当全班同学都在讨论最新番剧时，要不要担心信息茧房？</li>
+                                <li>动辄上千元的COS服装，该不该支持这种消费？</li>
+                            </ul>
+                            
+                            <p>或许我们需要新的沟通方式。</p>
+                            
+                            <p>最近试着陪女儿看了一集她最爱的《时光代理人》，意外发现这个看似花哨的动画，讲的其实是关于亲情与救赎的故事。她兴奋地给我分析角色服装上的传统纹样，那一刻我突然理解：这代孩子只是用新瓶子装了我们熟悉的酒。</p>
+                            
+                            <p>心理学家说，青少年需要"安全地叛逆"。二次元世界给了他们一个既刺激又可控的出口——那些夸张的发色和服饰，本质上和我们当年偷偷抽烟、深夜听摇滚一样，都是成长的仪式。</p>
+                            
+                            <p>给同样困惑的父母几个建议：</p>
+                            
+                            <ol>
+                                <li>先了解再评判：查查孩子喜欢的IP背景，很多国产动漫（如《天官赐福》）其实传递着正向价值观</li>
+                                <li>设定安全边界：约定参加漫展必须成人陪同，关注COSPLAY服装的材质安全性</li>
+                                <li>把爱好变成桥梁：如果孩子喜欢画动漫，不妨报个正经美术班；喜欢跳舞可以转为正规舞蹈训练</li>
+                            </ol>
+                            
+                            <p>站在商场二楼看着那群快乐舞动的年轻人，我突然想起《头号玩家》的台词："人们来到绿洲是为了做各种事，但他们留下来是为了做自己。"也许我们该担心的从来不是形式的新奇，而是孩子能否在虚拟与现实间找到平衡。</p>
+                            
+                            <p>毕竟，我们当年听着"不务正业"的周杰伦长大，现在不也都成了靠谱的大人？</p>
+                            
+                            <hr>
+                            
+                            <em>这篇随笔记录了一位80后父亲对二次元文化的观察与思考，展现了代际之间的理解与包容。作者通过自身经历，探讨了如何在尊重孩子个性的同时，引导他们健康成长的平衡之道。</em>
                         </div>
                         <div class="note-date">2025年8月17日</div>
                     </div>
