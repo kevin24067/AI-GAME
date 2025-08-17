@@ -17,7 +17,27 @@ class Game {
         this.keys = {};
         this.gameRunning = false;
         
+        // 初始化游戏记录追踪器
+        this.gameTracker = null;
+        this.initGameTracker();
+        
         this.setupEventListeners();
+    }
+
+    // 初始化游戏记录追踪器
+    async initGameTracker() {
+        try {
+            // 等待 Supabase 初始化
+            setTimeout(async () => {
+                if (window.SupabaseClient) {
+                    await window.SupabaseClient.init();
+                    this.gameTracker = new window.GameTracker('超级马里奥');
+                    console.log('马里奥游戏记录追踪器已初始化');
+                }
+            }, 1000);
+        } catch (error) {
+            console.error('初始化游戏追踪器失败:', error);
+        }
     }
     
     setupEventListeners() {
@@ -164,6 +184,12 @@ class Game {
             }
         }
         
+        // 更新游戏追踪器
+        if (this.gameTracker) {
+            this.gameTracker.updateScore(this.player.score);
+            this.gameTracker.updateLevel(1); // 马里奥游戏目前只有一关
+        }
+        
         // 更新UI
         this.scoreElement.textContent = this.player.score;
         this.livesElement.textContent = this.player.lives;
@@ -237,9 +263,24 @@ class Game {
         requestAnimationFrame(() => this.gameLoop());
     }
     
-    gameOver() {
+    async gameOver() {
         this.gameRunning = false;
         this.finalScoreElement.textContent = this.player.score;
+        
+        // 保存游戏记录
+        if (this.gameTracker) {
+            try {
+                const result = await this.gameTracker.saveGameRecord();
+                if (result.success) {
+                    console.log('马里奥游戏记录已保存');
+                } else {
+                    console.log('游戏记录保存失败:', result.message || result.error);
+                }
+            } catch (error) {
+                console.error('保存游戏记录时出错:', error);
+            }
+        }
+        
         this.gameOverScreen.classList.remove('hidden');
     }
 }

@@ -11,6 +11,10 @@ class MathGame {
         this.endTime = 0;
         this.answers = []; // 存储用户的答案
         
+        // 初始化游戏记录追踪器
+        this.gameTracker = null;
+        this.initGameTracker();
+        
         // DOM元素
         this.startScreen = document.getElementById('startScreen');
         this.gameScreen = document.getElementById('gameScreen');
@@ -29,6 +33,22 @@ class MathGame {
         
         // 绑定事件
         this.bindEvents();
+    }
+
+    // 初始化游戏记录追踪器
+    async initGameTracker() {
+        try {
+            // 等待 Supabase 初始化
+            setTimeout(async () => {
+                if (window.SupabaseClient) {
+                    await window.SupabaseClient.init();
+                    this.gameTracker = new window.GameTracker('算术小游戏');
+                    console.log('算术游戏记录追踪器已初始化');
+                }
+            }, 1000);
+        } catch (error) {
+            console.error('初始化游戏追踪器失败:', error);
+        }
     }
     
     /**
@@ -164,12 +184,30 @@ class MathGame {
     /**
      * 结束游戏
      */
-    endGame() {
+    async endGame() {
         this.gameOver = true;
         this.endTime = Date.now();
         const totalTime = this.endTime - this.startTime;
         const minutes = Math.floor(totalTime / 60000);
         const seconds = Math.floor((totalTime % 60000) / 1000);
+        
+        // 更新游戏追踪器
+        if (this.gameTracker) {
+            this.gameTracker.updateScore(this.score * 10); // 每题10分
+            this.gameTracker.updateLevel(this.grade); // 年级作为关卡
+            
+            // 保存游戏记录
+            try {
+                const result = await this.gameTracker.saveGameRecord();
+                if (result.success) {
+                    console.log('算术游戏记录已保存');
+                } else {
+                    console.log('游戏记录保存失败:', result.message || result.error);
+                }
+            } catch (error) {
+                console.error('保存游戏记录时出错:', error);
+            }
+        }
         
         // 更新结果界面
         this.finalScoreElement.textContent = this.score;
