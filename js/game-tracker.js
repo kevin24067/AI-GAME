@@ -13,10 +13,22 @@ class GameTracker {
     // 初始化用户信息
     async initUser() {
         try {
-            if (window.SupabaseClient) {
-                this.user = await window.SupabaseClient.auth.getCurrentUser();
-                console.log('游戏追踪器初始化，用户:', this.user?.email || '未登录');
+            // 等待 Supabase 初始化完成
+            let retries = 0;
+            const maxRetries = 10;
+            
+            while (retries < maxRetries) {
+                if (window.SupabaseClient && window.SupabaseClient.isInitialized()) {
+                    this.user = await window.SupabaseClient.auth.getCurrentUser();
+                    console.log('游戏追踪器初始化，用户:', this.user?.email || '未登录');
+                    return;
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+                retries++;
             }
+            
+            console.warn('Supabase 初始化超时，游戏记录功能可能不可用');
         } catch (error) {
             console.error('初始化用户信息失败:', error);
         }

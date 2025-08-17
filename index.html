@@ -114,20 +114,21 @@
     <script>
         // 页面加载时初始化 Supabase 并检查用户状态
         document.addEventListener('DOMContentLoaded', function() {
-            // 等待 Supabase 库加载完成
-            setTimeout(() => {
-                const client = window.SupabaseClient.init();
-                if (client) {
+            // 等待 Supabase 自动初始化完成
+            setTimeout(async () => {
+                if (window.SupabaseClient && window.SupabaseClient.isInitialized()) {
                     console.log('Supabase 连接成功！');
-                    checkAuthStatus();
+                    await checkAuthStatus();
                     
                     // 监听认证状态变化
                     window.SupabaseClient.auth.onAuthStateChange((event, session) => {
                         console.log('认证状态变化:', event, session);
-                        checkAuthStatus();
+                        setTimeout(checkAuthStatus, 100);
                     });
                 } else {
-                    console.error('Supabase 初始化失败');
+                    console.log('等待 Supabase 初始化...');
+                    // 如果还未初始化，继续等待
+                    setTimeout(arguments.callee, 500);
                 }
             }, 1000);
         });
