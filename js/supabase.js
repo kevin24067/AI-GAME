@@ -1,6 +1,28 @@
 // Supabase 配置和客户端
-const SUPABASE_URL = 'https://wdevawgwxnxqdgkxnegd.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkZXZhd2d3eG54cWRna3huZWdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzMDIwODAsImV4cCI6MjA3MDg3ODA4MH0.U_f453KdjSdELparSVe7YKgyLr2R2oLBwdluPFxVjAs';
+// 从环境变量或配置文件中获取敏感信息
+const getSupabaseConfig = () => {
+    // 优先从环境变量获取
+    if (typeof process !== 'undefined' && process.env) {
+        return {
+            url: process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL,
+            key: process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
+        };
+    }
+    
+    // 从全局配置对象获取（需要在 HTML 中设置）
+    if (typeof window !== 'undefined' && window.SUPABASE_CONFIG) {
+        return window.SUPABASE_CONFIG;
+    }
+    
+    // 开发环境默认配置（生产环境应该移除）
+    console.warn('⚠️ 使用默认 Supabase 配置，生产环境请设置环境变量');
+    return {
+        url: 'https://wdevawgwxnxqdgkxnegd.supabase.co',
+        key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkZXZhd2d3eG54cWRna3huZWdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzMDIwODAsImV4cCI6MjA3MDg3ODA4MH0.U_f453KdjSdELparSVe7YKgyLr2R2oLBwdluPFxVjAs'
+    };
+};
+
+const SUPABASE_CONFIG = getSupabaseConfig();
 
 // 创建 Supabase 客户端（使用 CDN 版本）
 let supabase;
@@ -21,8 +43,13 @@ function initSupabase() {
             return null;
         }
 
+        // 验证配置
+        if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.key) {
+            throw new Error('Supabase 配置不完整，请检查环境变量设置');
+        }
+
         // 创建客户端
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key, {
             auth: {
                 autoRefreshToken: true,
                 persistSession: true,
