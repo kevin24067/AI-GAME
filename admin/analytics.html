@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>页面访问统计 - 管理后台</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1, h2 {
+            color: #2c3e50;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .back-link {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3498db;
+        }
+        
+        .stat-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .chart-container {
+            margin-top: 30px;
+            height: 400px;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        select, input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #3498db;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            color: #e74c3c;
+            padding: 10px;
+            background-color: #fadbd8;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .tab.active {
+            background-color: #fff;
+            border-color: #ddd;
+            border-bottom-color: #fff;
+            margin-bottom: -1px;
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+        
+        .pagination button {
+            min-width: 40px;
+        }
+        
+        .pagination button.active {
+            background-color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>页面访问统计</h1>
+            <a href="../index.html" class="back-link">返回游戏大厅</a>
+        </div>
+        
+        <div id="auth-message"></div>
+        
+        <div id="content" style="display: none;">
+            <div class="tabs">
+                <div class="tab active" data-tab="overview">概览</div>
+                <div class="tab" data-tab="page-stats">页面统计</div>
+                <div class="tab" data-tab="visit-logs">访问日志</div>
+            </div>
+            
+            <div id="overview" class="tab-content active">
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-title">总访问量</div>
+                        <div class="stat-value" id="total-visits">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">今日访问量</div>
+                        <div class="stat-value" id="today-visits">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">独立访客数</div>
+                        <div class="stat-value" id="unique-visitors">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">平均停留时间</div>
+                        <div class="stat-value" id="avg-duration">--</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="visitsChart"></canvas>
+                </div>
+                
+                <h2>热门页面</h2>
+                <div class="table-container">
+                    <table id="popular-pages">
+                        <thead>
+                            <tr>
+                                <th>页面名称</th>
+                                <th>路径</th>
+                                <th>访问次数</th>
+                                <th>首次访问</th>
+                                <th>最近访问</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="loading">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="page-stats" class="tab-content">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="sort-by">排序方式</label>
+                        <select id="sort-by">
+                            <option value="visit_count">访问次数</option>
+                            <option value="last_visit">最近访问</option>
+                            <option value="first_visit">首次访问</option>
+                            <option value="page_name">页面名称</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="sort-order">排序顺序</label>
+                        <select id="sort-order">
+                            <option value="desc">降序</option>
+                            <option value="asc">升序</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="page-filter">页面筛选</label>
+                        <input type="text" id="page-filter" placeholder="输入页面名称或路径">
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button id="apply-filters">应用筛选</button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="all-pages">
+                        <thead>
+                            <tr>
+                                <th>页面名称</th>
+                                <th>路径</th>
+                                <th>访问次数</th>
+                                <th>首次访问</th>
+                                <th>最近访问</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="loading">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination" id="pages-pagination"></div>
+            </div>
+            
+            <div id="visit-logs" class="tab-content">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="date-from">开始日期</label>
+                        <input type="date" id="date-from">
+                    </div>
+                    <div class="filter-group">
+                        <label for="date-to">结束日期</label>
+                        <input type="date" id="date-to">
+                    </div>
+                    <div class="filter-group">
+                        <label for="page-path-filter">页面路径</label>
+                        <input type="text" id="page-path-filter" placeholder="输入页面路径">
+                    </div>
+                    <div class="filter-group">
+                        <label for="user-filter">用户ID</label>
+                        <input type="text" id="user-filter" placeholder="输入用户ID">
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button id="apply-log-filters">应用筛选</button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="visit-logs-table">
+                        <thead>
+                            <tr>
+                                <th>页面名称</th>
+                                <th>路径</th>
+                                <th>用户ID</th>
+                                <th>访问时间</th>
+                                <th>来源</th>
+                                <th>设备信息</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6" class="loading">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination" id="logs-pagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 从 CDN 加载 Supabase 和 Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/page-analytics.js"></script>
+    
+    <script>
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', async function() {
+            // 初始化 Supabase
+            await window.SupabaseClient.init();
+            
+            // 检查用户是否已登录
+            const user = await window.SupabaseClient.auth.getCurrentUser();
+            if (!user) {
+                document.getElementById('auth-message').innerHTML = `
+                    <div class="error">
+                        您需要 <a href="../login.html">登录</a> 才能访问此页面。
+                    </div>
+                `;
+                return;
+            }
+            
+            // 检查用户是否为管理员
+            const { data: userData, error: userError } = await window.supabaseClient
+                .from('users')
+                .select('is_admin')
+                .eq('id', user.id)
+                .single();
+                
+            if (userError || !userData || !userData.is_admin) {
+                document.getElementById('auth-message').innerHTML = `
+                    <div class="error">
+                        您没有权限访问此页面。只有管理员可以查看统计数据。
+                    </div>
+                `;
+                return;
+            }
+            
+            // 显示内容
+            document.getElementById('content').style.display = 'block';
+            
+            // 初始化标签页切换
+            initTabs();
+            
+            // 加载数据
+            loadOverviewData();
+            loadPageStats();
+            loadVisitLogs();
+        });
+        
+        // 初始化标签页切换
+        function initTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // 移除所有活动标签
+                    tabs.forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // 激活当前标签
+                    tab.classList.add('active');
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+        
+        // 加载概览数据
+        async function loadOverviewData() {
+            try {
+                const supabase = window.supabaseClient;
+                
+                // 获取总访问量
+                const { count: totalVisits, error: countError } = await supabase
+                    .from('page_visits')
+                    .select('*', { count: 'exact', head: true });
+                
+                if (countError) throw countError;
+                document.getElementById('total-visits').textContent = totalVisits;
+                
+                // 获取今日访问量
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const { count: todayVisits, error: todayError } = await supabase
+                    .from('page_visits')
+                    .select('*', { count: 'exact', head: true })
+                    .gte('visit_time', today.toISOString());
+                
+                if (todayError) throw todayError;
+                document.getElementById('today-visits').textContent = todayVisits;
+                
+                // 获取独立访客数
+                const { data: uniqueData, error: uniqueError } = await supabase
+                    .from('page_visits')
+                    .select('user_id', { count: 'exact' })
+                    .limit(1);
+                
+                if (uniqueError) throw uniqueError;
+                
+                const { count: uniqueVisitors } = await supabase.rpc('count_unique_visitors');
+                document.getElementById('unique-visitors').textContent = uniqueVisitors || '0';
+                
+                // 获取热门页面
+                const { data: popularPages, error: pagesError } = await supabase
+                    .from('page_stats')
+                    .select('*')
+                    .order('visit_count', { ascending: false })
+                    .limit(10);
+                
+                if (pagesError) throw pagesError;
+                
+                // 渲染热门页面表格
+                const tableBody = document.querySelector('#popular-pages tbody');
+                tableBody.innerHTML = '';
+                
+                if (popularPages.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5">暂无数据</td></tr>';
+                } else {
+                    popularPages.forEach(page => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${page.page_name}</td>
+                            <td>${page.page_path}</td>
+                            <td>${page.visit_count}</td>
+                            <td>${formatDate(page.first_visit)}</td>
+                            <td>${formatDate(page.last_visit)}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+                
+                // 加载图表数据
+                loadVisitsChart();
+                
+            } catch (error) {
+                console.error('加载概览数据失败:', error);
+                document.getElementById('auth-message').innerHTML = `
+                    <div class="error">
+                        加载数据失败: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // 加载访问图表
+        async function loadVisitsChart() {
+            try {
+                const supabase = window.supabaseClient;
+                
+                // 获取过去30天的数据
+                const endDate = new Date();
+                const startDate = new Date();
+                startDate.setDate(startDate.getDate() - 30);
+                
+                const { data, error } = await supabase
+                    .from('page_visits')
+                    .select('visit_time')
+                    .gte('visit_time', startDate.toISOString())
+                    .lte('visit_time', endDate.toISOString());
+                
+                if (error) throw error;
+                
+                // 按日期分组
+                const visitsByDate = {};
+                const labels = [];
+                
+                // 创建日期标签
+                for (let i = 0; i < 30; i++) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - (29 - i));
+                    const dateStr = formatDateShort(date);
+                    labels.push(dateStr);
+                    visitsByDate[dateStr] = 0;
+                }
+                
+                // 统计每天的访问量
+                data.forEach(visit => {
+                    const date = new Date(visit.visit_time);
+                    const dateStr = formatDateShort(date);
+                    if (visitsByDate[dateStr] !== undefined) {
+                        visitsByDate[dateStr]++;
+                    }
+                });
+                
+                // 准备图表数据
+                const chartData = labels.map(label => visitsByDate[label]);
+                
+                // 创建图表
+                const ctx = document.getElementById('visitsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '每日访问量',
+                            data: chartData,
+                            backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                            borderColor: 'rgba(52, 152, 219, 1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            pointBackgroundColor: 'rgba(52, 152, 219, 1)',
+                            pointRadius: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        }
+                    }
+                });
+                
+            } catch (error) {
+                console.error('加载图表数据失败:', error);
+            }
+        }
+        
+        // 加载页面统计数据
+        async function loadPageStats(page = 1, filters = {}) {
+            try {
+                const supabase = window.supabaseClient;
+                const pageSize = 10;
+                
+                // 构建查询
+                let query = supabase.from('page_stats').select('*', { count: 'exact' });
+                
+                // 应用筛选
+                if (filters.pageFilter) {
+                    query = query.or(`page_name.ilike.%${filters.pageFilter}%,page_path.ilike.%${filters.pageFilter}%`);
+                }
+                
+                // 应用排序
+                const sortBy = filters.sortBy || 'visit_count';
+                const sortOrder = filters.sortOrder || 'desc';
+                query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+                
+                // 应用分页
+                const from = (page - 1) * pageSize;
+                const to = from + pageSize - 1;
+                query = query.range(from, to);
+                
+                // 执行查询
+                const { data, error, count } = await query;
+                
+                if (error) throw error;
+                
+                // 渲染表格
+                const tableBody = document.querySelector('#all-pages tbody');
+                tableBody.innerHTML = '';
+                
+                if (data.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5">暂无数据</td></tr>';
+                } else {
+                    data.forEach(page => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${page.page_name}</td>
+                            <td>${page.page_path}</td>
+                            <td>${page.visit_count}</td>
+                            <td>${formatDate(page.first_visit)}</td>
+                            <td>${formatDate(page.last_visit)}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+                
+                // 渲染分页
+                renderPagination('pages-pagination', page, Math.ceil(count / pageSize), (newPage) => {
+                    loadPageStats(newPage, filters);
+                });
+                
+            } catch (error) {
+                console.error('加载页面统计数据失败:', error);
+                document.querySelector('#all-pages tbody').innerHTML = `
+                    <tr><td colspan="5" class="error">加载数据失败: ${error.message}</td></tr>
+                `;
+            }
+        }
+        
+        // 加载访问日志
+        async function loadVisitLogs(page = 1, filters = {}) {
+            try {
+                const supabase = window.supabaseClient;
+                const pageSize = 10;
+                
+                // 构建查询
+                let query = supabase.from('page_visits').select('*', { count: 'exact' });
+                
+                // 应用筛选
+                if (filters.dateFrom) {
+                    query = query.gte('visit_time', new Date(filters.dateFrom).toISOString());
+                }
+                
+                if (filters.dateTo) {
+                    const endDate = new Date(filters.dateTo);
+                    endDate.setHours(23, 59, 59, 999);
+                    query = query.lte('visit_time', endDate.toISOString());
+                }
+                
+                if (filters.pagePath) {
+                    query = query.ilike('page_path', `%${filters.pagePath}%`);
+                }
+                
+                if (filters.userId) {
+                    query = query.eq('user_id', filters.userId);
+                }
+                
+                // 应用排序
+                query = query.order('visit_time', { ascending: false });
+                
+                // 应用分页
+                const from = (page - 1) * pageSize;
+                const to = from + pageSize - 1;
+                query = query.range(from, to);
+                
+                // 执行查询
+                const { data, error, count } = await query;
+                
+                if (error) throw error;
+                
+                // 渲染表格
+                const tableBody = document.querySelector('#visit-logs-table tbody');
+                tableBody.innerHTML = '';
+                
+                if (data.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6">暂无数据</td></tr>';
+                } else {
+                    data.forEach(visit => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${visit.page_name}</td>
+                            <td>${visit.page_path}</td>
+                            <td>${visit.user_id}</td>
+                            <td>${formatDateTime(visit.visit_time)}</td>
+                            <td>${visit.referrer || '直接访问'}</td>
+                            <td>${visit.user_agent ? formatUserAgent(visit.user_agent) : '未知'}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+                
+                // 渲染分页
+                renderPagination('logs-pagination', page, Math.ceil(count / pageSize), (newPage) => {
+                    loadVisitLogs(newPage, filters);
+                });
+                
+            } catch (error) {
+                console.error('加载访问日志失败:', error);
+                document.querySelector('#visit-logs-table tbody').innerHTML = `
+                    <tr><td colspan="6" class="error">加载数据失败: ${error.message}</td></tr>
+                `;
+            }
+        }
+        
+        // 渲染分页
+        function renderPagination(containerId, currentPage, totalPages, callback) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            // 上一页按钮
+            const prevButton = document.createElement('button');
+            prevButton.textContent = '上一页';
+            prevButton.disabled = currentPage === 1;
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    callback(currentPage - 1);
+                }
+            });
+            container.appendChild(prevButton);
+            
+            // 页码按钮
+            const maxButtons = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+            
+            if (endPage - startPage + 1 < maxButtons) {
+                startPage = Math.max(1, endPage - maxButtons + 1);
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.classList.toggle('active', i === currentPage);
+                pageButton.addEventListener('click', () => {
+                    callback(i);
+                });
+                container.appendChild(pageButton);
+            }
+            
+            // 下一页按钮
+            const nextButton = document.createElement('button');
+            nextButton.textContent = '下一页';
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    callback(currentPage + 1);
+                }
+            });
+            container.appendChild(nextButton);
+        }
+        
+        // 格式化日期
+        function formatDate(dateString) {
+            if (!dateString) return '未知';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('zh-CN');
+        }
+        
+        // 格式化日期时间
+        function formatDateTime(dateString) {
+            if (!dateString) return '未知';
+            const date = new Date(dateString);
+            return date.toLocaleString('zh-CN');
+        }
+        
+        // 格式化短日期（仅月日）
+        function formatDateShort(date) {
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        }
+        
+        // 格式化用户代理字符串
+        function formatUserAgent(userAgent) {
+            // 简化用户代理信息
+            if (userAgent.includes('Chrome')) {
+                return 'Chrome 浏览器';
+            } else if (userAgent.includes('Firefox')) {
+                return 'Firefox 浏览器';
+            } else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
+                return 'Safari 浏览器';
+            } else if (userAgent.includes('Edge')) {
+                return 'Edge 浏览器';
+            } else if (userAgent.includes('MSIE') || userAgent.includes('Trident/')) {
+                return 'IE 浏览器';
+            } else if (userAgent.includes('Mobile')) {
+                return '移动设备';
+            } else {
+                return '其他浏览器';
+            }
+        }
+        
+        // 初始化事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 页面统计筛选
+            document.getElementById('apply-filters').addEventListener('click', () => {
+                const sortBy = document.getElementById('sort-by').value;
+                const sortOrder = document.getElementById('sort-order').value;
+                const pageFilter = document.getElementById('page-filter').value;
+                
+                loadPageStats(1, { sortBy, sortOrder, pageFilter });
+            });
+            
+            // 访问日志筛选
+            document.getElementById('apply-log-filters').addEventListener('click', () => {
+                const dateFrom = document.getElementById('date-from').value;
+                const dateTo = document.getElementById('date-to').value;
+                const pagePath = document.getElementById('page-path-filter').value;
+                const userId = document.getElementById('user-filter').value;
+                
+                loadVisitLogs(1, { dateFrom, dateTo, pagePath, userId });
+            });
+            
+            // 设置默认日期范围（过去7天）
+            const today = new Date();
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            
+            document.getElementById('date-to').valueAsDate = today;
+            document.getElementById('date-from').valueAsDate = weekAgo;
+        });
+    </script>
+</body>
+</html>
