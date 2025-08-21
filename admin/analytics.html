@@ -396,46 +396,109 @@
     <script>
         // 页面加载时初始化
         document.addEventListener('DOMContentLoaded', async function() {
-            // 初始化 Supabase
-            await window.SupabaseClient.init();
+            // 确保 Supabase CDN 已加载
+            if (typeof window.supabase === 'undefined') {
+                console.error('Supabase CDN 未加载，请检查网络连接');
+                document.getElementById('auth-message').innerHTML = `
+                    <div class="error">
+                        Supabase 加载失败，请刷新页面重试
+                    </div>
+                `;
+                return;
+            }
+            
+            // 直接创建 Supabase 客户端
+            try {
+                window.supabase = window.supabase.createClient(
+                    'https://wdevawgwxnxqdgkxnegd.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkZXZhd2d3eG54cWRna3huZWdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzMDIwODAsImV4cCI6MjA3MDg3ODA4MH0.U_f453KdjSdELparSVe7YKgyLr2R2oLBwdluPFxVjAs',
+                    {
+                        auth: {
+                            autoRefreshToken: true,
+                            persistSession: true,
+                            detectSessionInUrl: true
+                        }
+                    }
+                );
+                console.log('✅ Supabase 客户端直接初始化成功');
+            } catch (error) {
+                console.error('❌ Supabase 直接初始化失败:', error);
+                document.getElementById('auth-message').innerHTML = `
+                    <div class="error">
+                        Supabase 初始化失败，请刷新页面重试
+                    </div>
+                `;
+                return;
+            }
             
             // 检查用户是否已登录
-            const user = await window.SupabaseClient.auth.getCurrentUser();
-            if (!user) {
-                document.getElementById('auth-message').innerHTML = `
-                    <div class="error">
-                        您需要 <a href="../login.html">登录</a> 才能访问此页面。
-                    </div>
-                `;
-                return;
-            }
-            
-            // 检查用户是否为管理员
-            const { data: userData, error: userError } = await window.supabaseClient
-                .from('users')
-                .select('is_admin')
-                .eq('id', user.id)
-                .single();
+            try {
+                const { data: { user }, error } = await window.supabase.auth.getUser();
                 
-            if (userError || !userData || !userData.is_admin) {
+                if (error) {
+                    console.warn('获取用户信息失败:', error.message);
+                    document.getElementById('auth-message').innerHTML = `
+                        <div class="error">
+                            您需要 <a href="../login.html">登录</a> 才能访问此页面。
+                        </div>
+                    `;
+                    return;
+                }
+                
+                if (!user) {
+                    document.getElementById('auth-message').innerHTML = `
+                        <div class="error">
+                            您需要 <a href="../login.html">登录</a> 才能访问此页面。
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // 检查用户是否为管理员
+                // 首先尝试从 user_profiles 表中获取管理员状态
+                let isAdmin = false;
+                try {
+                    const { data: userData, error: userError } = await window.supabase
+                        .from('user_profiles')
+                        .select('is_admin')
+                        .eq('id', user.id)
+                        .single();
+                    
+                    if (!userError && userData && userData.is_admin) {
+                        isAdmin = true;
+                    }
+                } catch (profileError) {
+                    console.warn('获取用户资料失败:', profileError);
+                }
+                
+                // 如果用户不是管理员，显示错误信息
+                if (!isAdmin) {
+                    document.getElementById('auth-message').innerHTML = `
+                        <div class="error">
+                            您没有权限访问此页面。只有管理员可以查看统计数据。
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // 显示内容
+                document.getElementById('content').style.display = 'block';
+                
+                // 初始化标签页切换
+                initTabs();
+                
+                // 加载数据
+                loadOverviewData();
+                loadPageStats();
+                loadVisitLogs();
+            } catch (error) {
+                console.error('检查用户状态失败:', error);
                 document.getElementById('auth-message').innerHTML = `
                     <div class="error">
-                        您没有权限访问此页面。只有管理员可以查看统计数据。
+                        检查用户状态失败: ${error.message}
                     </div>
                 `;
-                return;
             }
-            
-            // 显示内容
-            document.getElementById('content').style.display = 'block';
-            
-            // 初始化标签页切换
-            initTabs();
-            
-            // 加载数据
-            loadOverviewData();
-            loadPageStats();
-            loadVisitLogs();
         });
         
         // 初始化标签页切换
@@ -460,7 +523,7 @@
         // 加载概览数据
         async function loadOverviewData() {
             try {
-                const supabase = window.supabaseClient;
+                const supabase = window.supabase;
                 
                 // 获取总访问量
                 const { count: totalVisits, error: countError } = await supabase
@@ -538,7 +601,7 @@
         // 加载访问图表
         async function loadVisitsChart() {
             try {
-                const supabase = window.supabaseClient;
+                const supabase = window.supabase;
                 
                 // 获取过去30天的数据
                 const endDate = new Date();
@@ -627,7 +690,7 @@
         // 加载页面统计数据
         async function loadPageStats(page = 1, filters = {}) {
             try {
-                const supabase = window.supabaseClient;
+                const supabase = window.supabase;
                 const pageSize = 10;
                 
                 // 构建查询
@@ -689,7 +752,7 @@
         // 加载访问日志
         async function loadVisitLogs(page = 1, filters = {}) {
             try {
-                const supabase = window.supabaseClient;
+                const supabase = window.supabase;
                 const pageSize = 10;
                 
                 // 构建查询

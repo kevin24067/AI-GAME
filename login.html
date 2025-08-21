@@ -66,23 +66,53 @@
     <script>
         // 页面加载时初始化 Supabase
         document.addEventListener('DOMContentLoaded', function() {
-            const client = window.SupabaseClient.init();
-            if (client) {
-                console.log('Supabase 连接成功！');
+            // 确保 Supabase CDN 已加载
+            if (typeof window.supabase === 'undefined') {
+                console.error('Supabase CDN 未加载，请检查网络连接');
+                showMessage('Supabase 加载失败，请刷新页面重试', 'error');
+                return;
+            }
+            
+            // 直接创建 Supabase 客户端
+            try {
+                window.supabase = window.supabase.createClient(
+                    'https://wdevawgwxnxqdgkxnegd.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkZXZhd2d3eG54cWRna3huZWdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzMDIwODAsImV4cCI6MjA3MDg3ODA4MH0.U_f453KdjSdELparSVe7YKgyLr2R2oLBwdluPFxVjAs',
+                    {
+                        auth: {
+                            autoRefreshToken: true,
+                            persistSession: true,
+                            detectSessionInUrl: true
+                        }
+                    }
+                );
+                console.log('✅ Supabase 客户端直接初始化成功');
                 
                 // 检查用户是否已登录
                 checkAuthStatus();
+            } catch (error) {
+                console.error('❌ Supabase 直接初始化失败:', error);
+                showMessage('Supabase 初始化失败，请刷新页面重试', 'error');
             }
         });
 
         // 检查认证状态
         async function checkAuthStatus() {
-            const user = await window.SupabaseClient.auth.getCurrentUser();
-            if (user) {
-                showMessage(`欢迎回来，${user.email}！`, 'success');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 2000);
+            try {
+                const { data: { user }, error } = await window.supabase.auth.getUser();
+                if (error) {
+                    console.warn('获取用户信息失败:', error.message);
+                    return;
+                }
+                
+                if (user) {
+                    showMessage(`欢迎回来，${user.email}！`, 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('检查认证状态失败:', error);
             }
         }
 
@@ -111,18 +141,28 @@
             
             showMessage('正在登录...', 'info');
             
-            const result = await window.SupabaseClient.auth.signIn(email, password);
-            
-            if (result.success) {
+            try {
+                const { data, error } = await window.supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+                
+                if (error) {
+                    showMessage(`登录失败: ${error.message}`, 'error');
+                    console.error('登录失败:', error);
+                    return;
+                }
+                
                 showMessage('登录成功！正在跳转...', 'success');
-                console.log('登录成功，用户信息:', result.data);
+                console.log('登录成功，用户信息:', data);
                 
                 // 确保认证状态已更新后再跳转
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 1500);
-            } else {
-                showMessage(`登录失败: ${result.error}`, 'error');
+            } catch (error) {
+                showMessage(`登录失败: ${error.message}`, 'error');
+                console.error('登录过程中出错:', error);
             }
         }
 
@@ -141,16 +181,28 @@
             
             showMessage('正在注册...', 'info');
             
-            const result = await window.SupabaseClient.auth.signUp(email, password);
-            
-            if (result.success) {
+            try {
+                const { data, error } = await window.supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                });
+                
+                if (error) {
+                    showMessage(`注册失败: ${error.message}`, 'error');
+                    console.error('注册失败:', error);
+                    return;
+                }
+                
                 showMessage('注册成功！请检查邮箱验证链接。', 'success');
+                console.log('注册成功:', data);
+                
                 // 切换到登录表单
                 setTimeout(() => {
                     showLogin();
                 }, 3000);
-            } else {
-                showMessage(`注册失败: ${result.error}`, 'error');
+            } catch (error) {
+                showMessage(`注册失败: ${error.message}`, 'error');
+                console.error('注册过程中出错:', error);
             }
         }
 

@@ -6,23 +6,15 @@ class Config {
         this.initialized = false;
     }
 
-    // 从环境变量或用户输入获取配置
+    // 从环境变量或硬编码配置获取
     async initialize() {
-        if (this.initialized) return;
+        if (this.initialized) return true;
 
-        // 尝试从环境变量获取（如果支持）
-        if (typeof process !== 'undefined' && process.env) {
-            this.supabaseUrl = process.env.VITE_SUPABASE_URL;
-            this.supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
-        }
-
-        // 如果没有环境变量，提示用户配置
-        if (!this.supabaseUrl || !this.supabaseAnonKey) {
-            console.warn('⚠️ Supabase 配置缺失');
-            console.warn('请在 .env 文件中配置 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY');
-            console.warn('或者联系管理员获取配置信息');
-            return false;
-        }
+        // 在浏览器环境中，直接使用硬编码的值（从.env文件中获取）
+        this.supabaseUrl = 'https://wdevawgwxnxqdgkxnegd.supabase.co';
+        this.supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkZXZhd2d3eG54cWRna3huZWdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzMDIwODAsImV4cCI6MjA3MDg3ODA4MH0.U_f453KdjSdELparSVe7YKgyLr2R2oLBwdluPFxVjAs';
+        
+        console.log('✅ Supabase 配置已加载');
 
         this.initialized = true;
         return true;
