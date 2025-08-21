@@ -1,14 +1,13 @@
 // Supabase 客户端 - 安全版本
-let supabase;
 let isInitialized = false;
 
 // 初始化 Supabase 客户端
 async function initSupabase() {
     try {
         // 避免重复初始化
-        if (isInitialized && supabase) {
+        if (isInitialized && window.supabase) {
             console.log('Supabase 客户端已初始化');
-            return supabase;
+            return window.supabase;
         }
 
         // 检查 Supabase CDN 是否加载
@@ -32,7 +31,7 @@ async function initSupabase() {
         const config = window.appConfig.getSupabaseConfig();
         
         // 创建客户端
-        supabase = window.supabase.createClient(config.url, config.anonKey, {
+        window.supabase = window.supabase.createClient(config.url, config.anonKey, {
             auth: {
                 autoRefreshToken: true,
                 persistSession: true,
@@ -46,7 +45,7 @@ async function initSupabase() {
         // 异步测试连接
         setTimeout(testConnection, 1000);
         
-        return supabase;
+        return window.supabase;
     } catch (error) {
         console.error('❌ Supabase 初始化失败:', error);
         return null;
@@ -56,9 +55,9 @@ async function initSupabase() {
 // 测试 Supabase 连接
 async function testConnection() {
     try {
-        if (!supabase) return;
+        if (!window.supabase) return;
         
-        const { data, error } = await supabase.from('user_game_records').select('count', { count: 'exact', head: true });
+        const { data, error } = await window.supabase.from('user_game_records').select('count', { count: 'exact', head: true });
         if (error) {
             console.warn('⚠️ Supabase 连接测试警告:', error.message);
         } else {
@@ -74,11 +73,11 @@ const auth = {
     // 注册新用户
     async signUp(email, password) {
         try {
-            if (!supabase) {
+            if (!window.supabase) {
                 throw new Error('Supabase 客户端未初始化');
             }
 
-            const { data, error } = await supabase.auth.signUp({
+            const { data, error } = await window.supabase.auth.signUp({
                 email: email,
                 password: password,
             });
@@ -96,11 +95,11 @@ const auth = {
     // 用户登录
     async signIn(email, password) {
         try {
-            if (!supabase) {
+            if (!window.supabase) {
                 throw new Error('Supabase 客户端未初始化');
             }
 
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const { data, error } = await window.supabase.auth.signInWithPassword({
                 email: email,
                 password: password,
             });
@@ -118,11 +117,11 @@ const auth = {
     // 用户登出
     async signOut() {
         try {
-            if (!supabase) {
+            if (!window.supabase) {
                 throw new Error('Supabase 客户端未初始化');
             }
 
-            const { error } = await supabase.auth.signOut();
+            const { error } = await window.supabase.auth.signOut();
             
             if (error) throw error;
             
@@ -137,17 +136,17 @@ const auth = {
     // 获取当前用户
     async getCurrentUser() {
         try {
-            if (!supabase) {
+            if (!window.supabase) {
                 console.warn('⚠️ Supabase 客户端未初始化');
                 return null;
             }
 
-            const { data: { user }, error } = await supabase.auth.getUser();
+            const { data: { user }, error } = await window.supabase.auth.getUser();
             if (error) {
                 // 如果是无效 JWT 错误，尝试刷新会话
                 if (error.message.includes('JWT') || error.message.includes('invalid')) {
                     console.log('🔄 尝试刷新用户会话...');
-                    const { data: { session } } = await supabase.auth.getSession();
+                    const { data: { session } } = await window.supabase.auth.getSession();
                     return session?.user || null;
                 }
                 console.warn('⚠️ 获取用户信息失败:', error.message);
@@ -167,12 +166,12 @@ const auth = {
     // 获取当前会话
     async getSession() {
         try {
-            if (!supabase) {
+            if (!window.supabase) {
                 console.warn('⚠️ Supabase 客户端未初始化');
                 return null;
             }
 
-            const { data: { session }, error } = await supabase.auth.getSession();
+            const { data: { session }, error } = await window.supabase.auth.getSession();
             if (error) {
                 console.warn('⚠️ 获取会话失败:', error.message);
                 return null;
@@ -192,11 +191,11 @@ const auth = {
 
     // 监听认证状态变化
     onAuthStateChange(callback) {
-        if (!supabase) {
+        if (!window.supabase) {
             console.warn('⚠️ Supabase 客户端未初始化');
             return null;
         }
-        return supabase.auth.onAuthStateChange(callback);
+        return window.supabase.auth.onAuthStateChange(callback);
     }
 };
 
@@ -205,11 +204,11 @@ const database = {
     // 插入数据
     async insert(table, data) {
         try {
-            if (!supabase) {
+            if (!window.supabase) {
                 throw new Error('Supabase 客户端未初始化');
             }
 
-            const { data: result, error } = await supabase
+            const { data: result, error } = await window.supabase
                 .from(table)
                 .insert(data)
                 .select();
@@ -227,11 +226,11 @@ const database = {
     // 查询数据
     async select(table, columns = '*', filters = {}) {
         try {
-            if (!supabase) {
+            if (!window.supabase) {
                 throw new Error('Supabase 客户端未初始化');
             }
 
-            let query = supabase.from(table).select(columns);
+            let query = window.supabase.from(table).select(columns);
             
             // 应用过滤条件
             Object.keys(filters).forEach(key => {
@@ -253,11 +252,11 @@ const database = {
     // 更新数据
     async update(table, data, filters = {}) {
         try {
-            if (!supabase) {
+            if (!window.supabase) {
                 throw new Error('Supabase 客户端未初始化');
             }
 
-            let query = supabase.from(table).update(data);
+            let query = window.supabase.from(table).update(data);
             
             // 应用过滤条件
             Object.keys(filters).forEach(key => {
@@ -279,11 +278,11 @@ const database = {
     // 删除数据
     async delete(table, filters = {}) {
         try {
-            if (!supabase) {
+            if (!window.supabase) {
                 throw new Error('Supabase 客户端未初始化');
             }
 
-            let query = supabase.from(table).delete();
+            let query = window.supabase.from(table).delete();
             
             // 应用过滤条件
             Object.keys(filters).forEach(key => {
@@ -308,7 +307,7 @@ window.SupabaseClient = {
     init: initSupabase,
     auth,
     database,
-    getClient: () => supabase,
+    getClient: () => window.supabase,
     isInitialized: () => isInitialized
 };
 

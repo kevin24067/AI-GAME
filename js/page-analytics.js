@@ -5,7 +5,6 @@
 
 class PageAnalytics {
   constructor() {
-    this.supabase = window.supabaseClient;
     this.initialized = false;
     this.currentPath = window.location.pathname;
     this.currentPage = this.getPageName();
@@ -15,14 +14,15 @@ class PageAnalytics {
    * 初始化分析模块
    */
   async init() {
-    if (!this.supabase) {
+    // 检查 Supabase 客户端
+    if (!window.supabase) {
       console.error('Supabase 客户端未初始化');
       return;
     }
 
     try {
       // 检查用户是否已登录
-      const { data: { user } } = await this.supabase.auth.getUser();
+      const { data: { user } } = await window.supabase.auth.getUser();
       this.userId = user ? user.id : 'anonymous';
       this.initialized = true;
       
@@ -79,7 +79,7 @@ class PageAnalytics {
       };
 
       // 记录访问日志
-      const { error: logError } = await this.supabase
+      const { error: logError } = await window.supabase
         .from('page_visits')
         .insert([visitData]);
 
@@ -89,7 +89,7 @@ class PageAnalytics {
       }
 
       // 更新页面访问计数
-      const { data: pageData, error: pageError } = await this.supabase
+      const { data: pageData, error: pageError } = await window.supabase
         .from('page_stats')
         .select('id, visit_count')
         .eq('page_path', this.currentPath)
@@ -102,7 +102,7 @@ class PageAnalytics {
 
       if (pageData) {
         // 页面记录已存在，更新计数
-        const { error: updateError } = await this.supabase
+        const { error: updateError } = await window.supabase
           .from('page_stats')
           .update({ 
             visit_count: pageData.visit_count + 1,
@@ -115,7 +115,7 @@ class PageAnalytics {
         }
       } else {
         // 创建新的页面记录
-        const { error: insertError } = await this.supabase
+        const { error: insertError } = await window.supabase
           .from('page_stats')
           .insert([{
             page_path: this.currentPath,
@@ -146,7 +146,7 @@ class PageAnalytics {
     }
 
     try {
-      let query = this.supabase.from('page_stats').select('*');
+      let query = window.supabase.from('page_stats').select('*');
       
       if (pagePath) {
         query = query.eq('page_path', pagePath);
@@ -172,21 +172,16 @@ document.addEventListener('DOMContentLoaded', () => {
   window.pageAnalytics = new PageAnalytics();
   
   // 等待 Supabase 客户端初始化完成后再初始化分析模块
-  if (window.supabaseClient) {
-    window.pageAnalytics.init();
-  } else {
-    // 如果 Supabase 客户端尚未加载，等待它加载完成
-    const checkSupabase = setInterval(() => {
-      if (window.supabaseClient) {
-        clearInterval(checkSupabase);
-        window.pageAnalytics.init();
-      }
-    }, 100);
-    
-    // 设置超时，避免无限等待
-    setTimeout(() => {
+  const checkSupabase = setInterval(() => {
+    if (window.supabase) {
       clearInterval(checkSupabase);
-      console.error('Supabase 客户端加载超时');
-    }, 5000);
-  }
+      window.pageAnalytics.init();
+    }
+  }, 100);
+  
+  // 设置超时，避免无限等待
+  setTimeout(() => {
+    clearInterval(checkSupabase);
+    console.error('Supabase 客户端加载超时');
+  }, 5000);
 });
