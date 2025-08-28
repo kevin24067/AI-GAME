@@ -1,0 +1,795 @@
+/* 法老之光游戏样式 */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
+
+:root {
+    --primary-gold: #FFD700;
+    --deep-blue: #1E3A8A;
+    --bronze: #CD7F32;
+    --laser-cyan: #00FFFF;
+    --dark-stone: #2D2D2D;
+    --light-stone: #8B7355;
+    --red-player: #DC2626;
+    --blue-player: #2563EB;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Cinzel', serif;
+    background: linear-gradient(135deg, var(--deep-blue) 0%, #0F172A 100%);
+    color: var(--primary-gold);
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+}
+
+/* 顶部信息栏 */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 2px solid var(--bronze);
+}
+
+.player-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.current-player {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(255, 215, 0, 0.2);
+    border: 2px solid var(--primary-gold);
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+.player-icon {
+    font-size: 24px;
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+.red-player {
+    color: var(--red-player);
+}
+
+.blue-player {
+    color: var(--blue-player);
+}
+
+.player-name {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.game-title {
+    text-align: center;
+}
+
+.game-title h1 {
+    font-size: 36px;
+    font-weight: 700;
+    text-shadow: 0 0 20px var(--primary-gold);
+    margin-bottom: 5px;
+}
+
+.hieroglyphs {
+    font-size: 20px;
+    opacity: 0.8;
+    letter-spacing: 10px;
+}
+
+.game-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.control-btn {
+    width: 50px;
+    height: 50px;
+    border: 2px solid var(--bronze);
+    background: rgba(205, 127, 50, 0.2);
+    color: var(--primary-gold);
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+    background: rgba(205, 127, 50, 0.4);
+    transform: scale(1.1);
+}
+
+/* 中央游戏区域 */
+.game-main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+}
+
+/* 右侧移动记录面板 */
+.move-history-panel {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 280px;
+    height: 500px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid var(--bronze);
+    border-radius: 10px;
+    padding: 15px;
+    color: var(--primary-gold);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--bronze);
+}
+
+.panel-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.undo-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 15px;
+    background: var(--bronze);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.undo-btn:hover:not(:disabled) {
+    background: var(--primary-gold);
+    color: var(--deep-blue);
+    transform: translateY(-1px);
+}
+
+.undo-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.move-list {
+    height: 420px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.move-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.move-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.move-list::-webkit-scrollbar-thumb {
+    background: var(--bronze);
+    border-radius: 3px;
+}
+
+.no-moves {
+    text-align: center;
+    color: var(--light-stone);
+    font-style: italic;
+    margin-top: 50px;
+}
+
+.move-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.move-item.red-move {
+    border-left-color: var(--red-player);
+}
+
+.move-item.blue-move {
+    border-left-color: var(--blue-player);
+}
+
+.move-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.move-info {
+    flex: 1;
+}
+
+.move-number {
+    font-size: 12px;
+    color: var(--light-stone);
+    margin-bottom: 2px;
+}
+
+.move-description {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.move-result {
+    font-size: 12px;
+    color: var(--light-stone);
+    margin-top: 2px;
+}
+
+.laser-result {
+    color: var(--laser-cyan);
+}
+
+.laser-result.hit {
+    color: #FF6B6B;
+}
+
+.game-board-container {
+    position: relative;
+    border: 4px solid var(--bronze);
+    border-radius: 10px;
+    background: var(--dark-stone);
+    box-shadow: 
+        0 0 30px rgba(255, 215, 0, 0.3),
+        inset 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+#gameCanvas {
+    display: block;
+    background: linear-gradient(45deg, #3A3A3A 25%, transparent 25%),
+                linear-gradient(-45deg, #3A3A3A 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #3A3A3A 75%),
+                linear-gradient(-45deg, transparent 75%, #3A3A3A 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+/* 激光效果层 */
+/* 激光效果层 */
+.laser-effects {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* 激光束样式 */
+.laser-beam {
+    position: absolute;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(0, 255, 255, 0.8) 20%, 
+        rgba(0, 255, 255, 1) 50%, 
+        rgba(0, 255, 255, 0.8) 80%, 
+        transparent 100%);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+    animation: laserPulse 0.5s ease-in-out;
+}
+
+@keyframes laserPulse {
+    0% { opacity: 0; transform: scaleX(0); }
+    50% { opacity: 1; transform: scaleX(0.5); }
+    100% { opacity: 1; transform: scaleX(1); }
+}
+
+/* 激光反射效果 */
+.laser-reflection {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: reflectionSparkle 1s ease-out;
+    z-index: 15;
+}
+
+@keyframes reflectionSparkle {
+    0% { 
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    50% { 
+        transform: scale(1.5) rotate(180deg);
+        opacity: 1;
+    }
+    100% { 
+        transform: scale(1) rotate(360deg);
+        opacity: 0.8;
+    }
+}
+
+/* 激光吸收效果 */
+.laser-absorption {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: absorptionShield 1s ease-out;
+    z-index: 15;
+}
+
+@keyframes absorptionShield {
+    0% { 
+        transform: scale(0);
+        opacity: 0;
+        filter: brightness(1);
+    }
+    30% { 
+        transform: scale(1.2);
+        opacity: 1;
+        filter: brightness(2);
+    }
+    100% { 
+        transform: scale(1);
+        opacity: 0.6;
+        filter: brightness(1);
+    }
+}
+
+/* 激光摧毁效果 */
+.laser-destruction {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: destructionExplosion 1s ease-out;
+    z-index: 15;
+}
+
+@keyframes destructionExplosion {
+    0% { 
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    20% { 
+        transform: scale(1.5) rotate(90deg);
+        opacity: 1;
+    }
+    60% { 
+        transform: scale(1.2) rotate(270deg);
+        opacity: 0.8;
+    }
+    100% { 
+        transform: scale(1) rotate(360deg);
+        opacity: 0.4;
+    }
+}
+
+/* 悬浮旋转控制按钮 */
+.rotation-controls {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 20px;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px;
+    border-radius: 15px;
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.rotation-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, var(--gold), #B8860B);
+    border: 2px solid var(--bronze);
+    border-radius: 10px;
+    color: var(--dark-brown);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 80px;
+}
+
+.rotation-btn:hover {
+    background: linear-gradient(135deg, #FFE55C, var(--gold));
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+}
+
+.rotation-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+
+.rotation-icon {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.rotation-text {
+    font-size: 12px;
+    text-align: center;
+}
+
+/* 激光效果 */
+.laser-beam {
+    position: absolute;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--laser-cyan) 20%, 
+        #FFFFFF 50%, 
+        var(--laser-cyan) 80%, 
+        transparent 100%);
+    box-shadow: 0 0 10px var(--laser-cyan);
+    animation: laserPulse 0.5s ease-in-out;
+}
+
+@keyframes laserPulse {
+    0% { opacity: 0; transform: scaleY(0.5); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+    100% { opacity: 0.8; transform: scaleY(1); }
+}
+
+.laser-hit {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle, #FFFFFF 0%, var(--laser-cyan) 50%, transparent 100%);
+    border-radius: 50%;
+    animation: laserHit 0.3s ease-out;
+}
+
+@keyframes laserHit {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: scale(2); opacity: 0; }
+}
+
+/* 底部操作面板 */
+.game-footer {
+    padding: 20px 40px;
+    background: rgba(0, 0, 0, 0.3);
+    border-top: 2px solid var(--bronze);
+}
+
+.operation-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.mode-selector {
+    display: flex;
+    gap: 10px;
+}
+
+.mode-btn {
+    padding: 12px 24px;
+    border: 2px solid var(--bronze);
+    background: rgba(205, 127, 50, 0.2);
+    color: var(--primary-gold);
+    border-radius: 25px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mode-btn.active {
+    background: var(--bronze);
+    color: white;
+    box-shadow: 0 0 15px rgba(205, 127, 50, 0.5);
+}
+
+.mode-btn:hover:not(.active) {
+    background: rgba(205, 127, 50, 0.4);
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 30px;
+    border: 3px solid var(--primary-gold);
+    background: rgba(255, 215, 0, 0.2);
+    color: var(--primary-gold);
+    border-radius: 30px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    background: rgba(255, 215, 0, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+}
+
+.action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.scarab-icon {
+    font-size: 20px;
+    animation: scarabGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes scarabGlow {
+    0% { filter: drop-shadow(0 0 5px var(--primary-gold)); }
+    100% { filter: drop-shadow(0 0 15px var(--primary-gold)); }
+}
+
+.game-info {
+    font-size: 14px;
+    color: var(--light-stone);
+    max-width: 200px;
+    text-align: right;
+}
+
+/* 游戏结束遮罩 */
+.game-over-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.victory-display {
+    position: relative;
+    text-align: center;
+    padding: 50px;
+    background: linear-gradient(135deg, var(--deep-blue) 0%, #0F172A 100%);
+    border: 4px solid var(--primary-gold);
+    border-radius: 20px;
+    box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+}
+
+.victory-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at center, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+    border-radius: 16px;
+}
+
+.victory-content {
+    position: relative;
+    z-index: 1;
+}
+
+.pharaoh-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: pharaohGlow 1s ease-in-out infinite alternate;
+}
+
+@keyframes pharaohGlow {
+    0% { 
+        filter: drop-shadow(0 0 20px var(--primary-gold));
+        transform: scale(1);
+    }
+    100% { 
+        filter: drop-shadow(0 0 40px var(--primary-gold));
+        transform: scale(1.1);
+    }
+}
+
+.victory-text {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-shadow: 0 0 20px var(--primary-gold);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.game-btn {
+    padding: 15px 30px;
+    border: 2px solid var(--bronze);
+    background: rgba(205, 127, 50, 0.2);
+    color: var(--primary-gold);
+    border-radius: 25px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.game-btn:hover {
+    background: var(--bronze);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* 游戏说明弹窗 */
+.rules-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, var(--deep-blue) 0%, #0F172A 100%);
+    border: 3px solid var(--primary-gold);
+    border-radius: 15px;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 2px solid var(--bronze);
+}
+
+.modal-header h3 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.close-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--bronze);
+    color: white;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    background: var(--primary-gold);
+    color: var(--deep-blue);
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.rules-section {
+    margin-bottom: 25px;
+}
+
+.rules-section h4 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--primary-gold);
+}
+
+.rules-section p, .rules-section li {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--light-stone);
+}
+
+.rules-section ul {
+    padding-left: 20px;
+}
+
+.rules-section li {
+    margin-bottom: 8px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .game-header {
+        padding: 15px 20px;
+    }
+    
+    .game-title h1 {
+        font-size: 28px;
+    }
+    
+    #gameCanvas {
+        width: 640px;
+        height: 512px;
+    }
+    
+    .operation-panel {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    #gameCanvas {
+        width: 480px;
+        height: 384px;
+    }
+    
+    .victory-text {
+        font-size: 24px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+}

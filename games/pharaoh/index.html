@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>法老之光 - Pharaoh's Light</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- 顶部信息栏 -->
+        <header class="game-header">
+            <div class="player-indicator">
+                <div class="current-player" id="currentPlayer">
+                    <span class="player-icon red-player">👑</span>
+                    <span class="player-name">红色玩家</span>
+                </div>
+            </div>
+            <div class="game-title">
+                <h1>法老之光</h1>
+                <div class="hieroglyphs">𓂀 𓊪 𓇯</div>
+            </div>
+            <div class="game-controls">
+                <button class="control-btn" id="settingsBtn">⚙️</button>
+                <button class="control-btn" id="exitBtn">❌</button>
+            </div>
+        </header>
+
+        <!-- 中央游戏区域 -->
+        <!-- 中央游戏区域 -->
+        <main class="game-main">
+            <div class="game-board-container">
+                <canvas id="gameCanvas" width="800" height="640"></canvas>
+                <div class="laser-effects" id="laserEffects"></div>
+                
+                <!-- 悬浮旋转控制按钮 -->
+                <div id="rotationControls" class="rotation-controls" style="display: none;">
+                    <button id="rotateClockwise" class="rotation-btn" title="顺时针旋转">
+                        <span class="rotation-icon">↻</span>
+                        <span class="rotation-text">顺时针</span>
+                    </button>
+                    <button id="rotateCounterclockwise" class="rotation-btn" title="逆时针旋转">
+                        <span class="rotation-icon">↺</span>
+                        <span class="rotation-text">逆时针</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- 右侧移动记录面板 -->
+        <aside class="move-history-panel">
+            <div class="panel-header">
+                <h3>移动记录</h3>
+                <button class="undo-btn" id="undoBtn" disabled>
+                    <span>↶</span>
+                    悔棋
+                </button>
+            </div>
+            <div class="move-list" id="moveList">
+                <div class="no-moves">暂无移动记录</div>
+            </div>
+        </aside>
+
+        <!-- 底部操作面板 -->
+        <footer class="game-footer">
+            <div class="operation-panel">
+                <div class="mode-selector">
+                    <button class="mode-btn active" id="moveMode">移动/交换</button>
+                    <button class="mode-btn" id="rotateMode">旋转</button>
+                </div>
+                <div class="game-info" id="gameInfo">
+                    选择一个棋子进行操作
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 游戏结束遮罩 -->
+    <div class="game-over-overlay" id="gameOverOverlay" style="display: none;">
+        <div class="victory-display">
+            <div class="victory-bg"></div>
+            <div class="victory-content">
+                <div class="pharaoh-icon">👑</div>
+                <h2 class="victory-text" id="victoryText">红色玩家获胜！</h2>
+                <div class="victory-effects"></div>
+                <div class="action-buttons">
+                    <button class="game-btn" id="restartBtn">重新开始</button>
+                    <button class="game-btn" id="menuBtn">返回主菜单</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 游戏说明弹窗 -->
+    <div class="rules-modal" id="rulesModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>游戏规则</h3>
+                <button class="close-btn" id="closeRules">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="rules-section">
+                    <h4>游戏目标</h4>
+                    <p>用激光击中对方的法老棋子获得胜利</p>
+                </div>
+                <div class="rules-section">
+                    <h4>棋子说明</h4>
+                    <ul>
+                        <li><strong>法老 👑</strong>：被激光击中即败北，不可移动</li>
+                        <li><strong>金字塔 🔺</strong>：单面反射镜，可旋转</li>
+                        <li><strong>圣甲虫 🪲</strong>：双面对角线反射，可旋转</li>
+                        <li><strong>阿努比斯 🐺</strong>：单面吸收盾，可旋转</li>
+                    </ul>
+                </div>
+                <div class="rules-section">
+                    <h4>操作方式</h4>
+                    <p>每回合选择：移动/交换棋子 或 旋转棋子</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/constants.js"></script>
+    <script src="js/piece.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/laser.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

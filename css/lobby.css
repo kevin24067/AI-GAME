@@ -173,6 +173,12 @@ header p {
     box-shadow: 0 0 10px rgba(39, 174, 96, 0.5);
 }
 
+.pharaoh-icon {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    border: 2px solid #CD7F32;
+}
+
 /* 游戏信息 */
 .game-info {
     padding: 20px;
